@@ -1,0 +1,7 @@
+numpy
+matplotlib
+colorama
+openai
+requests
+beautifulsoup4
+python-pptx
