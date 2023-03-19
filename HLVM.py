@@ -39,8 +39,8 @@ def prompt_LLM(prompt, return_code = False):
         return ''
     time.sleep(1/API_CALLS_PER_MIN)
     response = openai.ChatCompletion.create(
-      model="gpt-4",
-      #model="gpt-3.5-turbo-0301",
+      #model="gpt-4",
+      model="gpt-3.5-turbo-0301",
       messages=[
             {"role": "system", "content": CODE_SYSTEM_MESSAGE if return_code else CONGNITIVE_SYSTEM_MESSAGE},
             {"role": "user", "content": prompt},
