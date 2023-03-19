@@ -3,14 +3,6 @@
 ## A sentient LLM-powered shell for any OS
 
 ## How to use:
-- create `prompts.py` in the HLVM directory to define `CODE_SYSTEM_MESSAGE`, `CONGNITIVE_USER_MESSAGE`, `CODE_PROMPT_PREFIX`
-- some example values for this might be:
-```python
-CODE_SYSTEM_MESSAGE = "Return linux python3 code so the user can achieve their goal by running the code."
-CONGNITIVE_SYSTEM_MESSAGE = """You are a helpful assistant. Please give your response to the user's goal."""
-CONGNITIVE_USER_MESSAGE = "Use a large language model with prompt engineering to help achieve this goal by importing prompt_LLM(prompt: str) -> str from HLVM."
-CODE_PROMPT_PREFIX = lambda goal: f"Write python3 code so I can achieve my goal by running my code. Do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result."
-```
 - create `keys.py` in the HLVM directory to define `OPENAI_KEY`
 - Add the HLVM directory to your PATH environment variable to access it from anywhere.
 
