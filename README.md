@@ -31,8 +31,7 @@
 ### Work:
 - write a powerpoint presentation on the economy of France based on the wikipedia sections --debug
 - save text files for the first 10 fibonacci numbers
-- download and save a $VIX dataset
-- download and save a $SPY dataset
+- download and save a $VIX dataset asnd a $SPY dataset
 - merge spy.csv and vix.csv and name the columns accordingly, then save it
 - do a statistical analysis of the Close_SPY and Close_VIX from merged_data.csv
 - plot VIX_Close and the 30-day standard deviation of SPY_Close over time from merged.csv. show two y axes for the data.

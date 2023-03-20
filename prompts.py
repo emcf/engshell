@@ -24,3 +24,30 @@ print(canada_page.summary)
 
 # Print the full content of the page
 print(canada_page.content)"""
+CODE_USER_CALIBRATION_MESSAGE2 = """make my wallpaper a galaxy"""
+CODE_ASSISTANT_CALIBRATION_MESSAGE2 = """import requests
+import ctypes
+import os
+
+url = "https://api.unsplash.com/search/photos"
+params = {
+    "query": "galaxy",    # search for "galaxy"
+    "orientation": "landscape",   # limit results to landscape orientation
+    "client_id": "sNWPyVSvc7poBLQjMk9-ZjQDWn00HGw9Ec4p5jzwtUI"   # Unsplash access key
+}
+
+response = requests.get(url, params=params)
+
+# Get the URL of the first image in the results
+image_url = response.json()["results"][0]["urls"]["regular"]
+
+# Download the image and save it to a file
+response = requests.get(image_url)
+with open("galaxy.jpg", "wb") as f:
+    f.write(response.content)
+
+# Change it to a galaxy
+ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.abspath("galaxy.jpg"), 3)
+
+# Print to confirm goal has been completed
+print("Wallpaper changed to a galaxy.")"""

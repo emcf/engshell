@@ -15,7 +15,7 @@ HLVM_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fo
 API_CALLS_PER_MIN = 30
 VERBOSE = False
 MAX_DEBUG_ATTEMPTS = 2
-IGNORE_ERRORS = ["The server had an error while processing your request. Sorry about that!"]
+RETRY_ERRORS = ["The server had an error while processing your request. Sorry about that!"]
 memory = []
 
 def print_console_prompt():
@@ -69,8 +69,8 @@ def LLM(prompt, mode='text'):
             {"role": "user", "content": prompt},
         ]
     response = openai.ChatCompletion.create(
-      #model="gpt-4",
-      model="gpt-3.5-turbo-0301",
+      model="gpt-4",
+      #model="gpt-3.5-turbo-0301",
       messages=messages,
       temperature = 0.0
     )
@@ -99,7 +99,7 @@ def run_python(goal, debug = False, showcode = False):
     attempts = 0
     should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
     should_install = (output is not None) and ('No module named' in output)
-    should_retry = should_debug or ((output is not None) and any([(err in output) for err in IGNORE_ERRORS]))
+    should_retry = should_debug or ((output is not None) and any([(err in output) for err in RETRY_ERRORS]))
     while should_retry:
         if should_debug:
             if should_install:
@@ -115,21 +115,24 @@ def run_python(goal, debug = False, showcode = False):
         success, output = containerize_code(returned_code)
         attempts += 1
         should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
-        should_retry = should_debug or any([(err in output) for err in IGNORE_ERRORS])
+        should_retry = should_debug or any([(err in output) for err in RETRY_ERRORS])
     if not success:
-        print_err(f"exiting ({output})")
-        return ''
+        raise ValueError(f"failed ({output})")
     return output
 
 def clear_memory():
+    global memory
     memory = [
             {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
+            {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE2},
+            {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE2},
     ]
 
 if __name__ == "__main__":
     if os.name == 'nt': os.system('')
+    clear_memory()
     while user_input := input(HLVM_PREVIX()):
         if user_input == 'refresh': 
             clear_memory()
@@ -140,13 +143,18 @@ if __name__ == "__main__":
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
         user_prompt = USER_MESSAGE(user_input)
-        try:
-            console_output = run_python(user_prompt, debug, showcode)
-            if len(console_output) > MAX_PROMPT:
-                print_status('output too large, summarizing...')
-                console_output = summarize(console_output)
-            print_success(console_output)
-            memory.append({"role": "user", "content": user_prompt})
-            memory.append({"role": "assistant", "content": console_output})
-        except Exception as e:
-            print_err(str(e))
+        run_code = True
+        while run_code:
+            try:
+                console_output = run_python(user_prompt, debug, showcode)
+                if len(console_output) > MAX_PROMPT:
+                    print_status('output too large, summarizing...')
+                    console_output = summarize(console_output)
+                if console_output == '': console_output = 'done executing.'
+                print_success(console_output)
+                memory.append({"role": "user", "content": user_prompt})
+                memory.append({"role": "assistant", "content": console_output})
+                run_code = False
+            except Exception as e:
+                error_message = str(e)
+                run_code = any([err in error_message for err in RETRY_ERRORS])
