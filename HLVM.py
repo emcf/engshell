@@ -12,7 +12,7 @@ openai.api_key = OPENAI_KEY
 MAX_PROMPT = 4096
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
 HLVM_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "HLVM" + Style.RESET_ALL + '>'
-API_CALLS_PER_MIN = 30
+API_CALLS_PER_MIN = 50
 VERBOSE = False
 MAX_DEBUG_ATTEMPTS = 2
 RETRY_ERRORS = ["The server had an error while processing your request. Sorry about that!"]
@@ -99,19 +99,19 @@ def run_python(goal, debug = False, showcode = False):
     attempts = 0
     should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
     should_install = (output is not None) and ('No module named' in output)
-    should_retry = should_debug or ((output is not None) and any([(err in output) for err in RETRY_ERRORS]))
+    should_retry = should_debug or should_install or ((output is not None) and any([(err in output) for err in RETRY_ERRORS]))
     while should_retry:
-        if should_debug:
-            if should_install:
-                print_status('installing: ' + output)
-                returned_command = LLM(prompt, mode='install')
-                subprocess.run(returned_command, shell=True, capture_output=True, text=True)
-            else:
-                prompt = returned_code + '\n\n The previous code gives the error ' + output + ', given the following python code, rewrite the code with the error resolved:\n'
-                print_status('debugging: ' + output)
-                returned_code = LLM(prompt, mode='code')
-                if showcode: 
-                    print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
+        if should_install:
+            print_status('installing: ' + output)
+            prompt = INSTALL_USER_MESSAGE(output)
+            returned_command = LLM(prompt, mode='install')
+            os.system(returned_command)
+        elif should_debug:
+            prompt = returned_code + '\n\n The previous code gives the error ' + output + ', given the following python code, rewrite the code with the error resolved:\n'
+            print_status('debugging: ' + output)
+            returned_code = LLM(prompt, mode='code')
+            if showcode: 
+                print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
         success, output = containerize_code(returned_code)
         attempts += 1
         should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
@@ -134,8 +134,10 @@ if __name__ == "__main__":
     if os.name == 'nt': os.system('')
     clear_memory()
     while user_input := input(HLVM_PREVIX()):
-        if user_input == 'refresh': 
+        if user_input == 'clear':
             clear_memory()
+            os.system("cls")
+            continue
         if '--llm' in user_input: user_input += CONGNITIVE_USER_MESSAGE
         debug = '--debug' in user_input
         showcode = '--showcode' in user_input
@@ -157,4 +159,5 @@ if __name__ == "__main__":
                 run_code = False
             except Exception as e:
                 error_message = str(e)
+                print(error_message)
                 run_code = any([err in error_message for err in RETRY_ERRORS])
