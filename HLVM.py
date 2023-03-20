@@ -121,7 +121,7 @@ def run_python(goal, debug = False, showcode = False):
         should_retry = should_debug or any([(err in output) for err in RETRY_ERRORS])
     if not success:
         raise ValueError(f"failed ({output})")
-    return output
+    return output, returned_code
 
 def clear_memory():
     global memory
@@ -129,10 +129,13 @@ def clear_memory():
             {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
+            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE2},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE2},
+            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE2},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE3},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE3},
+            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE3},
     ]
 
 if __name__ == "__main__":
@@ -153,14 +156,15 @@ if __name__ == "__main__":
         run_code = True
         while run_code:
             try:
-                console_output = run_python(user_prompt, debug, showcode)
-                if len(console_output) > MAX_PROMPT:
-                    print_status('output too large, summarizing...')
-                    console_output = summarize(console_output)
+                console_output, returned_code = run_python(user_prompt, debug, showcode)
+                #if len(console_output) > MAX_PROMPT:
+                #    print_status('output too large, summarizing...')
+                #    console_output = summarize(console_output)
                 if console_output == '': console_output = 'done executing.'
                 print_success(console_output)
                 memory.append({"role": "user", "content": user_prompt})
-                memory.append({"role": "assistant", "content": console_output})
+                memory.append({"role": "assistant", "content": returned_code})
+                memory.append({"role": "system", "content": console_output})
                 run_code = False
             except Exception as e:
                 error_message = str(e)

@@ -29,9 +29,9 @@ CODE_ASSISTANT_CALIBRATION_MESSAGE2 = f"""import openai
 openai.api_key = "your_openai_api_key_here"
 prompt = "Write a Shakespearean poem: "
 response = openai.Completion.create(
-    engine="text-davinci-002",
+    engine="gpt-3.5-turbo",
     prompt=prompt,
-    max_tokens=256,
+    max_tokens=512,
     n=1,
     stop=None,
     temperature=0.7,
@@ -58,3 +58,23 @@ with open("galaxy.jpg", "wb") as f:
 ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.abspath("galaxy.jpg"), 3)
 # Print to confirm goal has been completed
 print("Wallpaper changed to a galaxy.")"""
+CONSOLE_OUTPUT_CALIBRATION_MESSAGE = """Canada is a country in North America. Its ten provinces and three territories extend from the Atlantic Ocean to the Pacific Ocean and northward into the Arctic Ocean, covering over 9.98 million square kilometres
+
+== History ==
+=== European and Indigenous peoples ===
+Indigenous peoples include the First Nations, Inuit, and Métis, who have inhabited Canada for thousands of years.
+
+== Government and Politics ==
+Canada is a parliamentary liberal democracy and a constitutional monarchy in the Westminster tradition.
+The prime minister as the head of government and the governor general representing the monarch of Canada as head of state.
+
+== Economy ==
+Canada has the 24th highest nominal per capita income globally and the fifteenth-highest ranking on the Human Development Index. It has an advanced economy that relies on natural resources and well-developed international trade networks.
+
+== Geography and Demographics ==
+Canada is the world's second-largest country by total area, stretching from the Atlantic Ocean to the Pacific Ocean and northward into the Arctic Ocean, and has a diverse and multicultural population due to large-scale immigration."""
+CONSOLE_OUTPUT_CALIBRATION_MESSAGE2 = """Oh sweet summer, thy warmth doth bring,
+The songs of birds and flowers in bloom,
+And in thy gentle embrace we sing,
+Of love and life and sweet perfume."""
+CONSOLE_OUTPUT_CALIBRATION_MESSAGE3 = """Wallpaper changed to a galaxy."""
