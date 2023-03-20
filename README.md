@@ -7,9 +7,10 @@
 - Add the HLVM directory to your PATH environment variable to access it from anywhere.
 
 ## Notes:
-- `--cognitive` allows LLM queries from within the code execution.
-- `--debug` allows LLM to debug its own code if it fails.
+- `--llm` allows LLM queries from within the code execution.
+- `--debug` allows HVLM to debug its own code if it fails.
 - `--showcode` shows the code being executed.
+- `forget` resets HVLM's memory
 - Errors due to missing pip installs will not be auto-debugged due to secutity risk. You must debug these yourself.
 - Innapropriate requests are designed to be denied via prompting.
 
@@ -39,4 +40,4 @@
 - escape to the above level and print the python code that started this exec() --debug --showcode
 - cgenerate a templates/index.html, then display my camera feed on an ngrok server
 - record my key presses for the next 10 seconds and save it in a file --debug --showcode
-- print out the parsed keypresses from the json in key_presses.json by prompting llm --cognitive
+- print out the parsed keypresses from the json in key_presses.json by prompting llm --llm

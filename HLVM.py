@@ -5,14 +5,18 @@ import os
 from prompts import *
 from keys import OPENAI_KEY
 import subprocess
+import io
+import contextlib
 
 openai.api_key = OPENAI_KEY
+MAX_PROMPT = 4096
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
 HLVM_PREVIX = Style.RESET_ALL + "<HLVM> "
 API_CALLS_PER_MIN = 30
 VERBOSE = False
 MAX_DEBUG_ATTEMPTS = 2
 IGNORE_ERRORS = ["The server had an error while processing your request. Sorry about that!"]
+memory = []
 
 def print_console_prompt():
     print(HLVM_PREVIX, end="")
@@ -37,12 +41,20 @@ def clean_code_string(response_content):
         if response_content[:len(code_languge)]==code_languge: response_content = response_content[len(code_languge)+1:] # remove python+newline blocks
     return response_content    
 
+def summarize(text):
+    summarized = text
+    raise NotImplementedError("summarize(text) not yet implemented")
+    return summarized
+
 def LLM(prompt, mode='text'):
-    if len(prompt) > 10000: raise ValueError('context > 10000 chars')
+    global memory
+    if len(prompt) > MAX_PROMPT: 
+        print_status('prompt too large, summarizing...')
+        prompt = summarize(prompt)
     time.sleep(1.0/API_CALLS_PER_MIN)
     moderation_resp = openai.Moderation.create(input=prompt)
     if moderation_resp.results[0].flagged:
-        raise ValueError('prompt flagged by moderation endpoint')
+        raise ValueError(f'prompt ({prompt}) flagged by moderation endpoint')
     time.sleep(1.0/API_CALLS_PER_MIN)
     if mode == 'text':
         messages=[
@@ -50,10 +62,7 @@ def LLM(prompt, mode='text'):
             {"role": "user", "content": prompt},
         ]
     elif mode == 'code':
-        messages=[
-            {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
-            {"role": "user", "content": prompt},
-        ]
+        messages=memory+[{"role": "user", "content": prompt}]
     elif mode == 'install':
         messages=[
             {"role": "system", "content": INSTALL_SYSTEM_CALIBRATION_MESSAGE},
@@ -69,21 +78,24 @@ def LLM(prompt, mode='text'):
     if mode == 'code': response_content = clean_code_string(response_content)
     return response_content
 
-def containerize_code(code_string, verbose):
-    if verbose: print(code_string, end = '' if code_string[-1] == '\n' else '\n')
-    print_status("running...")
+def containerize_code(code_string):
     try:
-        print(Style.RESET_ALL + Fore.GREEN, end="")
-        exec(code_string,globals())
+        output_buffer = io.StringIO()
+        with contextlib.redirect_stdout(output_buffer):
+            exec(code_string,globals())
     except Exception as e:
         error_msg = str(e)
         return False, error_msg
-    return True, None
+    code_printout = output_buffer.getvalue()
+    return True, code_printout
 
-def run_python(goal, debug = False, verbose = False):
+def run_python(goal, debug = False, showcode = False):
     print_status("compiling...")
     returned_code = LLM(goal, mode='code')
-    success, output = containerize_code(returned_code, verbose)
+    if showcode: 
+        print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
+    print_status("running...")
+    success, output = containerize_code(returned_code)
     attempts = 0
     should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
     should_install = (output is not None) and ('No module named' in output)
@@ -93,34 +105,48 @@ def run_python(goal, debug = False, verbose = False):
             if should_install:
                 print_status('installing: ' + output)
                 returned_command = LLM(prompt, mode='install')
-                result = subprocess.run(returned_command, shell=True, capture_output=True, text=True)
-                print(result)
+                subprocess.run(returned_command, shell=True, capture_output=True, text=True)
             else:
                 prompt = returned_code + '\n\n The previous code gives the error ' + output + ', given the following python code, rewrite the code with the error resolved:\n'
                 print_status('debugging: ' + output)
                 returned_code = LLM(prompt, mode='code')
-        success, output = containerize_code(returned_code, verbose)
+                if showcode: 
+                    print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
+        success, output = containerize_code(returned_code)
         attempts += 1
         should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
         should_retry = should_debug or any([(err in output) for err in IGNORE_ERRORS])
     if not success:
         print_err(f"exiting ({output})")
-        return None
+        return ''
     return output
 
-if __name__ == "__main__":
+def clear_memory():
     memory = [
-
+            {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
+            {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE},
+            {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
     ]
+
+if __name__ == "__main__":
     if os.name == 'nt': os.system('')
-    while user_input:=input(HLVM_PREVIX):
-        if '--cognitive' in user_input: user_input += CONGNITIVE_USER_MESSAGE
+    while user_input := input(HLVM_PREVIX):
+        if user_input == 'refresh': 
+            clear_memory()
+        if '--llm' in user_input: user_input += CONGNITIVE_USER_MESSAGE
         debug = '--debug' in user_input
-        verbose = '--showcode' in user_input
-        user_input = user_input.replace('--cognitive','')
+        showcode = '--showcode' in user_input
+        user_input = user_input.replace('--llm','')
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
-        #try:
-        run_python(USER_MESSAGE(user_input), debug, verbose)
-        #except Exception as e:
-        #    print_err(str(e))
+        user_prompt = USER_MESSAGE(user_input)
+        try:
+            console_output = run_python(user_prompt, debug, showcode)
+            if len(console_output) > MAX_PROMPT:
+                print_status('output too large, summarizing...')
+                console_output = summarize(console_output)
+            print_success(console_output)
+            memory.append({"role": "user", "content": user_prompt})
+            memory.append({"role": "assistant", "content": console_output})
+        except Exception as e:
+            print_err(str(e))
