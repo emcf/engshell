@@ -21,6 +21,7 @@
 - download a picture of a dog
 - clear the console
 - get headlines from CBC
+- make my wallpaper something truly creative
 - record my screen for the next 10 seconds, then save it as an mp4.
 - play deadmau5 strobe
 - make a 5 second countdown timer

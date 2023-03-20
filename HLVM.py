@@ -3,7 +3,7 @@ import time
 from colorama import Fore, Style
 import os
 from prompts import *
-from keys import OPENAI_KEY
+from keys import OPENAI_KEY, UNSPLASH_ACCESS_KEY
 import subprocess
 import io
 import contextlib
@@ -79,12 +79,15 @@ def LLM(prompt, mode='text'):
     return response_content
 
 def containerize_code(code_string):
+    code_string = code_string.replace('your_openai_api_key_here', OPENAI_KEY)
+    code_string = code_string.replace('your_unsplash_access_key_here', UNSPLASH_ACCESS_KEY)
     try:
         output_buffer = io.StringIO()
         with contextlib.redirect_stdout(output_buffer):
             exec(code_string,globals())
     except Exception as e:
         error_msg = str(e)
+        print('got error message:', error_msg)
         return False, error_msg
     code_printout = output_buffer.getvalue()
     return True, code_printout
@@ -128,6 +131,8 @@ def clear_memory():
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE2},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE2},
+            {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE3},
+            {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE3},
     ]
 
 if __name__ == "__main__":
