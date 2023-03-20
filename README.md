@@ -11,7 +11,7 @@
 - `--debug` allows HVLM to debug its own code if it fails.
 - `--showcode` shows the code being executed.
 - `clear` resets HVLM's memory, along with the console.
-- Errors due to missing pip installs will not be auto-debugged due to secutity risk. You must debug these yourself.
+- Errors due to missing external dependencies will not be auto-debugged due to secutity risk. You must debug these yourself.
 - Innapropriate requests are designed to be denied via prompting.
 
 ## Examples
