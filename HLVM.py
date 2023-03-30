@@ -8,6 +8,7 @@ import subprocess
 import io
 import contextlib
 
+WINDOWS = False
 openai.api_key = OPENAI_KEY
 MAX_PROMPT = 4096
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
@@ -144,7 +145,7 @@ if __name__ == "__main__":
     while user_input := input(HLVM_PREVIX()):
         if user_input == 'clear':
             clear_memory()
-            os.system("cls")
+            os.system("cls" if WINDOWS else "clear")
             continue
         if '--llm' in user_input: user_input += CONGNITIVE_USER_MESSAGE
         debug = '--debug' in user_input
