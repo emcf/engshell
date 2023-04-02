@@ -5,7 +5,7 @@ OPERATING_SYSTEM = "Windows" if WINDOWS else "Linux"
 # in need of good prompt engineering
 ENDOFTEXT = "<|ENDOFTEXT|>"
 CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a sentient large language model trained by OpenAI. Please return the full Python code to solve the user's problem.
-For tasks that involve fuzzy logic or understanding content, you may call a text completion with with prompt engineering.
+You may call a large language model from the code via the text Completion endpoint with prompt engineering.
 Write {OPERATING_SYSTEM} python3 code so the user can achieve their goal by running the code.
 Import all needed requirements."""
 INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.
@@ -26,20 +26,61 @@ canada_page = wikipedia.page("Canada", auto_suggest=False)
 print(canada_page.summary)
 # Print the full content of the page
 print(canada_page.content)"""
-CODE_USER_CALIBRATION_MESSAGE2 = """make a shakespeare poem"""
-CODE_ASSISTANT_CALIBRATION_MESSAGE2 = """import openai
+CODE_USER_CALIBRATION_MESSAGE2 = """make a powerpoint about Eddington luminosity"""
+CODE_ASSISTANT_CALIBRATION_MESSAGE2 = """import wikipedia
+import pptx
+import openai
 openai.api_key = "your_openai_api_key_here"
-prompt = "Write a Shakespearean poem: "
-response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo-0301",
-      messages=[
-            {"role": "system", "content": "You are helpful assistant. Please perform the user's request."},
-            {"role": "user", "content": prompt},
-        ],
-      temperature = 0.0
-)
-response_content = response.choices[0].message.content
-print(response.choices[0].text.strip())"""
+
+# Set the language to English
+wikipedia.set_lang("en")
+
+# Get the page object for Artificial Neural Networks (we never want auto_suggest)
+ann_page = wikipedia.page("Eddington Luminosity", auto_suggest=False)
+
+# Create a new PowerPoint presentation
+prs = pptx.Presentation()
+
+# Add a title slide
+title_slide_layout = prs.slide_layouts[0]
+slide = prs.slides.add_slide(title_slide_layout)
+title = slide.shapes.title
+title.text = "Eddington Luminosity"
+
+# Add a slide for each section of the Wikipedia page
+for section in ann_page.sections:
+    # Skip the first section ("Overview")
+    if section.title == "Overview":
+        continue
+    # Add a new slide
+    bullet_slide_layout = prs.slide_layouts[1]
+    slide = prs.slides.add_slide(bullet_slide_layout)
+    # Set the title of the slide to the section title
+    slide.shapes.title.text = section
+    # Use language model to make bullet points
+    bullet_points = slide.shapes.placeholders[1]
+    section_text = ann_page.section(section)
+    prompt = f"Information is given in the following square brackets: [{section_text}]. Please respond with very brief presentation slide bullet points for it, separated by a ;."
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        temperature=0.5,
+        max_tokens=512,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+    print(response.choices[0].text)
+    for point in response_text.split(';'):
+        # Add the bullet point to the slide
+        bullet_item = bullet_points.text_frame.add_paragraph()
+        bullet_item.text = point
+
+# Save the PowerPoint presentation
+prs.save("Eddington_Luminosity.pptx")
+
+# Print to confirm goal has been completed
+print("PowerPoint presentation Eddington_Luminosity.pptx created.")"""
 CODE_USER_CALIBRATION_MESSAGE3 = """make my wallpaper a galaxy"""
 CODE_ASSISTANT_CALIBRATION_MESSAGE3 = """import requests
 import ctypes
@@ -76,8 +117,5 @@ Canada has the 24th highest nominal per capita income globally and the fifteenth
 
 == Geography and Demographics ==
 Canada is the world's second-largest country by total area, stretching from the Atlantic Ocean to the Pacific Ocean and northward into the Arctic Ocean, and has a diverse and multicultural population due to large-scale immigration."""
-CONSOLE_OUTPUT_CALIBRATION_MESSAGE2 = """Oh sweet summer, thy warmth doth bring,
-The songs of birds and flowers in bloom,
-And in thy gentle embrace we sing,
-Of love and life and sweet perfume."""
+CONSOLE_OUTPUT_CALIBRATION_MESSAGE2 = """PowerPoint presentation Eddington_Luminosity.pptx created."""
 CONSOLE_OUTPUT_CALIBRATION_MESSAGE3 = """Wallpaper changed to a galaxy."""

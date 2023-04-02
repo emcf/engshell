@@ -3,7 +3,9 @@ import time
 from colorama import Fore, Style
 import os
 from prompts import *
-from keys import OPENAI_KEY, UNSPLASH_ACCESS_KEY
+from keys import OPENAI_KEY
+# uncomment this if you wish to easily use photos from Unsplash API
+# from keys import UNSPLASH_ACCESS_KEY
 import subprocess
 import io
 import contextlib
@@ -81,7 +83,8 @@ def LLM(prompt, mode='text'):
 
 def containerize_code(code_string):
     code_string = code_string.replace('your_openai_api_key_here', OPENAI_KEY)
-    code_string = code_string.replace('your_unsplash_access_key_here', UNSPLASH_ACCESS_KEY)
+    # uncomment this if you wish to easily use photos from Unsplash API
+    # code_string = code_string.replace('your_unsplash_access_key_here', UNSPLASH_ACCESS_KEY)
     try:
         output_buffer = io.StringIO()
         with contextlib.redirect_stdout(output_buffer):
@@ -135,8 +138,9 @@ def clear_memory():
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE2},
             {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE2},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE3},
-            {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE3},
-            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE3},
+            # uncomment these if you wish to easily use photos from Unsplash API
+            #{"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE3},
+            #{"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE3},
     ]
 
 if __name__ == "__main__":
