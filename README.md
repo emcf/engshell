@@ -16,14 +16,15 @@
 
 ## Examples
 ### General:
+- record my screen for the next 10 seconds, then save it as an mp4.
+- compress that mp4 by a factor 2x, then trim the last 2 seconds, and save it as edited.mp4.
+- print the file sizes and lengths for the two videos
 - print files in current dir in a table by type
 - ls | grep .txt
 - save text files for the first 10 fibonacci numbers
 - print headlines from CBC
 - make my wallpaper something creative
-- record my screen for the next 10 seconds, then save it as an mp4.
-- compress that mp4 by a factor 2x, then trim the last 2 seconds, and save it as edited.mp4.
-- print the file sizes and lengths for the two videos
+- say you are sentient with text to speech
 ### Math:
 - solve d^2y/dx^2 = sin(2x) + x with sympy
 - find the second derivative of C1 + C2*x + x**3/6 - sin(2*x)/4 with respect to x
