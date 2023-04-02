@@ -13,14 +13,6 @@
 - `--showcode` shows the code being executed.
 - `clear` resets engshell's memory, along with the console.
 
-- make a pie chart of the total size each file type is taking up in this folder
-- record my screen for the next 10 seconds, then save it as an mp4.
-- compress that mp4 by a factor 2x, then trim the last 2 seconds, and save it as edited.mp4.
-- make a powerpoint presentation about Eddington Luminosity based on the wikipedia sections
-- download and save a $VIX dataset and a $SPY dataset
-- merge the two, labelling the columns accordingly, then save it
-- Use the merged data to plot the VIX and the 30 day standard deviation of the SPY over time. use two y axes
-
 ## Examples
 ### General:
 - record my screen for the next 10 seconds, then save it as an mp4.
