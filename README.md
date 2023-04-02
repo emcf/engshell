@@ -9,9 +9,9 @@
 
 ## Notes:
 - `--llm` allows LLM queries from within the code execution.
-- `--debug` allows HVLM to debug its own code if it fails.
+- `--debug` allows engshell to debug its own code if it fails.
 - `--showcode` shows the code being executed.
-- `clear` resets HVLM's memory, along with the console.
+- `clear` resets engshell's memory, along with the console.
 - Errors due to missing external dependencies will not be auto-debugged due to secutity risk. You must debug these yourself.
 - Innapropriate requests are designed to be denied via prompting.
 
