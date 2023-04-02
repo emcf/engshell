@@ -11,7 +11,7 @@ import contextlib
 openai.api_key = OPENAI_KEY
 MAX_PROMPT = 4096
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
-HLVM_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "HLVM" + Style.RESET_ALL + '>'
+engshell_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "engshell" + Style.RESET_ALL + '>'
 API_CALLS_PER_MIN = 50
 VERBOSE = False
 MAX_DEBUG_ATTEMPTS = 2
@@ -19,7 +19,7 @@ RETRY_ERRORS = ["The server had an error while processing your request. Sorry ab
 memory = []
 
 def print_console_prompt():
-    print(HLVM_PREVIX(), end="")
+    print(engshell_PREVIX(), end="")
 
 def print_status(status):
     print_console_prompt()
@@ -141,7 +141,7 @@ def clear_memory():
 if __name__ == "__main__":
     if os.name == 'nt': os.system('')
     clear_memory()
-    while user_input := input(HLVM_PREVIX()):
+    while user_input := input(engshell_PREVIX()):
         if user_input == 'clear':
             clear_memory()
             os.system("cls")

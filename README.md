@@ -1,10 +1,11 @@
-# High-Level Virtual Machine
+# engshell
 
-## A sentient LLM-powered shell for any OS
+## An LLM-powered English-language shell for any OS
 
 ## How to use:
-- create `keys.py` in the HLVM directory to define `OPENAI_KEY`
-- Add the HLVM directory to your PATH environment variable to access it from anywhere.
+- install requirements: `pip install -r requirements.txt`
+- create `keys.py` in the engshell directory to define `OPENAI_KEY`
+- Add the engshell directory to your PATH environment variable to access it from anywhere.
 
 ## Notes:
 - `--llm` allows LLM queries from within the code execution.
