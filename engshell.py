@@ -9,8 +9,9 @@ from keys import OPENAI_KEY
 import subprocess
 import io
 import contextlib
+import platform
 
-WINDOWS = False
+WINDOWS = platform.system() == "Windows"
 openai.api_key = OPENAI_KEY
 MAX_PROMPT = 4096
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
