@@ -25,17 +25,18 @@ print(canada_page.summary)
 # Print the full content of the page
 print(canada_page.content)"""
 CODE_USER_CALIBRATION_MESSAGE2 = """make a shakespeare poem"""
-CODE_ASSISTANT_CALIBRATION_MESSAGE2 = f"""import openai
+CODE_ASSISTANT_CALIBRATION_MESSAGE2 = """import openai
 openai.api_key = "your_openai_api_key_here"
 prompt = "Write a Shakespearean poem: "
-response = openai.Completion.create(
-    engine="gpt-3.5-turbo",
-    prompt=prompt,
-    max_tokens=512,
-    n=1,
-    stop=None,
-    temperature=0.7,
+response = openai.ChatCompletion.create(
+      model="gpt-3.5-turbo-0301",
+      messages=[
+            {"role": "system", "content": "You are helpful assistant. Please perform the user's request."},
+            {"role": "user", "content": prompt},
+        ],
+      temperature = 0.0
 )
+response_content = response.choices[0].message.content
 print(response.choices[0].text.strip())"""
 CODE_USER_CALIBRATION_MESSAGE3 = """make my wallpaper a galaxy"""
 CODE_ASSISTANT_CALIBRATION_MESSAGE3 = """import requests

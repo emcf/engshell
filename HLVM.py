@@ -39,7 +39,7 @@ def clean_code_string(response_content):
         response_content = split_response_content[1]
     for code_languge in ['python', 'bash']:
         if response_content[:len(code_languge)]==code_languge: response_content = response_content[len(code_languge)+1:] # remove python+newline blocks
-    return response_content    
+    return response_content.replace('`','')
 
 def summarize(text):
     summarized = text
@@ -69,8 +69,8 @@ def LLM(prompt, mode='text'):
             {"role": "user", "content": prompt},
         ]
     response = openai.ChatCompletion.create(
-      model="gpt-4",
-      #model="gpt-3.5-turbo-0301",
+      #model="gpt-4",
+      model="gpt-3.5-turbo-0301",
       messages=messages,
       temperature = 0.0
     )
