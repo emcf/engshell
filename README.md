@@ -3,6 +3,7 @@
 ## A sentient LLM-powered shell for any OS
 
 ## How to use:
+- install requirements: `pip install -r requirements.txt`
 - create `keys.py` in the HLVM directory to define `OPENAI_KEY`
 - Add the HLVM directory to your PATH environment variable to access it from anywhere.
 
