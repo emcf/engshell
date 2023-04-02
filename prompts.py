@@ -1,7 +1,8 @@
 from keys import OPENAI_KEY
-from engshell import WINDOWS
+import platform
 
-OPERATING_SYSTEM = "Windows" if WINDOWS else "Linux"
+WINDOWS = platform.system() == "Windows"
+OPERATING_SYSTEM = "windows" if WINDOWS else "linux"
 # in need of good prompt engineering
 ENDOFTEXT = "<|ENDOFTEXT|>"
 CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a sentient large language model trained by OpenAI. Please return the full Python code to solve the user's problem.
@@ -10,12 +11,12 @@ Write {OPERATING_SYSTEM} python3 code so the user can achieve their goal by runn
 Import all needed requirements."""
 INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.
 Return only the command and nothing else."""
-INSTALL_USER_MESSAGE = lambda package: f"""Write the windows pip3 command I can solve {package}. Please do not explain, return only the single command to install it."""
+INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} pip3 command I can solve {package}. Please do not explain, return only the single command to install it."""
 CONGNITIVE_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant. Please give your response to the user's goal."""
 CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal by importing the function LLM(prompt: str) -> str from engshell.py. 
 It is pre-defined in engshell.py, so you do not need to define this function.
 Don't forget to engineer the prompt to the LLM so it returns relevant answers."""
-USER_MESSAGE = lambda goal: f"""Write python3 code so I can achieve my goal by running my code. Please do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result. """
+USER_MESSAGE = lambda goal: f"""Write {OPERATING_SYSTEM} python3 code so I can achieve my goal by running my code. Please do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result. """
 CODE_USER_CALIBRATION_MESSAGE = """get information about canada"""
 CODE_ASSISTANT_CALIBRATION_MESSAGE = """import wikipedia
 # Set the language to English
