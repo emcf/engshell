@@ -5,7 +5,8 @@
 ## How to use:
 - install requirements: `pip install -r requirements.txt`
 - create `keys.py` in the engshell directory to define `OPENAI_KEY`
-- Add the engshell directory to your PATH environment variable to access it from anywhere.
+- run `python engshell.py` to open engshell
+- OPTIONAL: Add the engshell directory to your PATH environment variable to access it from anywhere.
 
 ## Notes:
 - `--llm` encourages LLM queries from within the code execution.
