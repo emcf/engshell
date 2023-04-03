@@ -24,7 +24,6 @@
 - print headlines from CBC
 - make my wallpaper something creative
 - make a pie chart of the total size each file type is taking up in this folder
-- say you are sentient with text to speech
 ### 🧠 Complexity Tests:
 - solve d^2y/dx^2 = sin(2x) + x with sympy
 - find the second derivative of C1 + C2*x + x**3/6 - sin(2*x)/4 with respect to x
