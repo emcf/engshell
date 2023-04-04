@@ -30,7 +30,6 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 ### 🧠 Complexity Tests:
 - solve d^2y/dx^2 = sin(2x) + x with sympy
 - find the second derivative of C1 + C2*x + x**3/6 - sin(2*x)/4 with respect to x
-- plot the 2D wavefunction for a hydrogen atom at its 4th excited state
 - make a powerpoint presentation about Eddington Luminosity based on the wikipedia sections
 - download and save a $VIX dataset and a $SPY dataset
 - merge the two, labelling the columns accordingly, then save it
