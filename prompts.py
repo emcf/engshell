@@ -1,28 +1,40 @@
 from keys import OPENAI_KEY
 import platform
+import system_info
 
-WINDOWS = platform.system() == "Windows"
-OPERATING_SYSTEM = "windows" if WINDOWS else "linux"
+
+SYSTEM_INFO = system_info.get_system_info()
+OPERATING_SYSTEM = system_info.get_operating_system()
 # in need of good prompt engineering
 ENDOFTEXT = "<|ENDOFTEXT|>"
 CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a sentient large language model trained by OpenAI. Please return the full Python code to solve the user's problem.
 You may call a large language model from the code via the text Completion endpoint with prompt engineering.
 Write {OPERATING_SYSTEM} python3 code so the user can achieve their goal by running the code.
-Import all needed requirements."""
+Import all needed requirements.  System information: {SYSTEM_INFO}"""
 INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.
 Return only the command and nothing else."""
-INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} pip3 command I can solve {package}. Please do not explain, return only the single command to install it."""
+
+
+def INSTALL_USER_MESSAGE(
+    package): return f"""Write the {OPERATING_SYSTEM} pip3 command I can solve {package}. Please do not explain, return only the single command to install it."""
+
+
 CONGNITIVE_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant. Please give your response to the user's goal."""
-CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal by importing the function LLM(prompt: str) -> str from engshell.py. 
+CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal by importing the function LLM(prompt: str) -> str from engshell.py.
 It is pre-defined in engshell.py, so you do not need to define this function.
 Don't forget to engineer the prompt to the LLM so it returns relevant answers."""
-USER_MESSAGE = lambda goal: f"""Write {OPERATING_SYSTEM} python3 code so I can achieve my goal by running my code. Please do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result. """
+
+
+def USER_MESSAGE(
+    goal): return f"""Write {OPERATING_SYSTEM} python3 code so I can achieve my goal by running my code. Please do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result. """
+
+
 CODE_USER_CALIBRATION_MESSAGE = """get information about canada"""
 CODE_ASSISTANT_CALIBRATION_MESSAGE = """import wikipedia
 # Set the language to English
 wikipedia.set_lang("en")
 # Get the page object for Canada (we never want auto_suggest)
-canada_page = wikipedia.page("Canada", auto_suggest=False) 
+canada_page = wikipedia.page("Canada", auto_suggest=False)
 # Print the summary of the page
 print(canada_page.summary)
 # Print the full content of the page
@@ -31,7 +43,7 @@ CODE_USER_CALIBRATION_MESSAGE2 = """make a powerpoint about Eddington luminosity
 CODE_ASSISTANT_CALIBRATION_MESSAGE2 = """import wikipedia
 import pptx
 import openai
-openai.api_key = "your_openai_api_key_here"
+openai.api_key = "{OPENAI_KEY}"
 
 # Set the language to English
 wikipedia.set_lang("en")
