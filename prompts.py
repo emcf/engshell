@@ -11,7 +11,7 @@ Write {OPERATING_SYSTEM} python3 code so the user can achieve their goal by runn
 Import all needed requirements."""
 INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.
 Return only the command and nothing else."""
-INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} pip3 command I can solve {package}. Please do not explain, return only the single command to install it."""
+INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} pip3 command I can install {package}. Please do not explain, return only the single command to install it."""
 CONGNITIVE_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant. Please give your response to the user's goal."""
 CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal by importing the function LLM(prompt: str) -> str from engshell.py. 
 It is pre-defined in engshell.py, so you do not need to define this function.
