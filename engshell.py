@@ -2,6 +2,7 @@ import openai
 import time
 from colorama import Fore, Style
 import os
+import sys
 from prompts import *
 from keys import OPENAI_KEY
 # uncomment this if you wish to easily use photos from Unsplash API
@@ -146,15 +147,30 @@ def clear_memory():
 
 if __name__ == "__main__":
     if os.name == 'nt': os.system('')
+    if '--showcode' in sys.argv:
+        print("showcode argument set to enabled")
+        always_showcode = True
+    else:
+        always_showcode = False
+    if '--debug' in sys.argv:
+        print("debug argument set to enabled")
+        always_debug = True
+    else:
+        always_debug = False
+    if '--llm' in sys.argv:
+        print("llm argument set to enabled")
+        always_llm = True
+    else:
+        always_llm = False
     clear_memory()
     while user_input := input(engshell_PREVIX()):
         if user_input == 'clear':
             clear_memory()
             os.system("cls" if WINDOWS else "clear")
             continue
-        if '--llm' in user_input: user_input += CONGNITIVE_USER_MESSAGE
-        debug = '--debug' in user_input
-        showcode = '--showcode' in user_input
+        if ('--llm' in user_input) or always_llm: user_input += CONGNITIVE_USER_MESSAGE
+        debug = ('--debug' in user_input) or always_debug
+        showcode = ('--showcode' in user_input) or always_showcode
         user_input = user_input.replace('--llm','')
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
