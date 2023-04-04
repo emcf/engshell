@@ -29,7 +29,7 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 - make a pie chart of the total size each file type is taking up in this folder
 ### 🧠 Complexity Tests:
 - solve d^2y/dx^2 = sin(2x) + x with sympy --debug
-- find the second derivative of C1 + C2*x + x\**3/6 - sin(2*x)/4 with respect to x --debug
+- find the second derivative of C1 + C2*x + x\*\*3/6 - sin(2*x)/4 with respect to x --debug
 - make a powerpoint presentation about Eddington Luminosity based on the wikipedia sections --debug
 - download and save a $VIX dataset and a $SPY dataset
 - merge the two, labelling the columns accordingly, then save it
