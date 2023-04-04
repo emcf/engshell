@@ -138,8 +138,8 @@ def clear_memory():
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE2},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE2},
             {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE2},
-            {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE3},
             # uncomment these if you wish to easily use photos from Unsplash API
+            #{"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE3},
             #{"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE3},
             #{"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE3},
     ]
