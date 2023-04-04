@@ -1,6 +1,6 @@
 # engshell
 
-## An LLM-powered English-language shell for any OS
+## A minimal English-language shell for any OS, powered by large language models
 
 https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-86a1-bd337c81aac8.mp4
 
