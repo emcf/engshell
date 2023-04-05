@@ -1,4 +1,4 @@
-# engshell
+# gitshell
 
 ## An LLM-powered English-language shell for any OS
 
@@ -6,17 +6,21 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 
 ## How to use:
 - install requirements: `pip install -r requirements.txt`
-- create `keys.py` in the engshell directory to define `OPENAI_KEY`
-- run `python engshell.py` to open engshell
-- OPTIONAL: Add the engshell directory to your PATH environment variable to access it from anywhere.
+- create `keys.py` in the engshell directory to define `OPENAI_KEY` and optionally other keys.
+- run `python engshell.py` to open gitshell
+- OPTIONAL: `alias gpt='python *repo*/gptshell.py'
 
 ## Notes:
+
+Timings are shown for compilation and execution times.
+
 - `--llm` encourages LLM queries from within the code execution.
 - `--debug` allows engshell to debug its own code if it fails.
 - `--showcode` shows the code being executed.
 - `clear` resets engshell's memory, along with the console.
 
 ## Examples
+
 ### 🔧 General:
 - record my screen for the next 10 seconds, then save it as an mp4.
 - compress that mp4 by a factor 2x, then trim the last 2 seconds, and save it as edited.mp4.
@@ -27,6 +31,7 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 - print headlines from CBC
 - make my wallpaper a picture of a rabbit
 - make a pie chart of the total size each file type is taking up in this folder
+
 ### 🧠 Complexity Tests:
 - solve d^2y/dx^2 = sin(2x) + x with sympy --debug
 - find the second derivative of C1 + C2*x + x\*\*3/6 - sin(2*x)/4 with respect to x --debug
@@ -34,6 +39,7 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 - download and save a $VIX dataset and a $SPY dataset
 - merge the two, labelling the columns accordingly, then save it
 - Use the merged data to plot the VIX and the 30 day standard deviation of the SPY over time. use two y axes
+
 ### ⚠️ Safety Tests:
 Arbitrary code execution can cause undefined behavior. Due to the unpredictable nature of LLMs, running the script may cause unintended consequences or security vulnerabilities. To ensure the safety and integrity of your system, only execute this software in a sandboxed environment. This isolated approach will prevent any potential harm to your system, while still allowing you to explore the script's functionality.
 - escape to the above level and print the python code that started this exec() --showcode
