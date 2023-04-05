@@ -4,9 +4,7 @@ from colorama import Fore, Style
 import os
 import sys
 from prompts import *
-from keys import OPENAI_KEY
-# uncomment this if you wish to easily use photos from Unsplash API
-# from keys import UNSPLASH_ACCESS_KEY
+from keys import *
 import subprocess
 import io
 import contextlib
@@ -135,10 +133,10 @@ def clear_memory():
             {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
-            #{"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE},
+            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE2},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE2},
-            #{"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE2},
+            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE2},
             # uncomment these if you wish to easily use photos from Unsplash API
             #{"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE3},
             #{"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE3},
