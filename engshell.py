@@ -113,6 +113,7 @@ def run_python(returned_code, debug = False, showcode = False):
             print_status('installing: ' + output)
             prompt = INSTALL_USER_MESSAGE(output)
             returned_command = LLM(prompt, mode='install')
+            returned_command = clean_code_string(returned_command)
             os.system(returned_command)
         elif should_debug:
             prompt = returned_code + '\n\n The previous code gives the error ' + output + ', given the following python code, rewrite the code with the error resolved:\n'
@@ -134,10 +135,10 @@ def clear_memory():
             {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
-            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE},
+            #{"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE2},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE2},
-            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE2},
+            #{"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE2},
             # uncomment these if you wish to easily use photos from Unsplash API
             #{"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE3},
             #{"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE3},

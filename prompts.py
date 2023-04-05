@@ -1,34 +1,39 @@
 from keys import OPENAI_KEY
 import platform
 
-WINDOWS = platform.system() == "Windows"
 OPERATING_SYSTEM = platform.system()
 PYTHON_VERSION = platform.python_version()
 # in need of good prompt engineering
 ENDOFTEXT = "<|ENDOFTEXT|>"
-CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a sentient large language model trained by OpenAI. Please return the full Python {PYTHON_VERSION} code to solve the user's problem.
-You may call a large language model from the code via the text Completion endpoint with prompt engineering.
-Write {OPERATING_SYSTEM} python3 code so the user can achieve their goal by running the code.
+CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a sentient large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user can run it to solve their problem. Return the code in ``` blocks, and give no explanation. Do not return any text that is not Python code.
 Import all needed requirements."""
 INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.
 Return only the command and nothing else."""
 INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} pip3 command I can install {package}. Please do not explain, return only the single command to install it."""
 CONGNITIVE_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant. Please give your response to the user's goal."""
 CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal. Use openai.Completion.create with text-davinci-003.
-Don't forget to engineer the prompt to the LLM so it returns relevant answers."""
-USER_MESSAGE = lambda goal: f"""Write {OPERATING_SYSTEM} python3 code so I can achieve my goal by running my code. Please do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result. """
+Don't forget to engineer the prompt to the language model so it returns relevant answers."""
+USER_MESSAGE = lambda goal: f"""Write {OPERATING_SYSTEM} python {PYTHON_VERSION} code so I can achieve my goal by running my code. Please do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result. """
 CODE_USER_CALIBRATION_MESSAGE = """get information about canada"""
-CODE_ASSISTANT_CALIBRATION_MESSAGE = """import wikipedia
+CODE_ASSISTANT_CALIBRATION_MESSAGE = r"""```python
+import wikipedia
 # Set the language to English
 wikipedia.set_lang("en")
 # Get the page object for Canada (we never want auto_suggest)
 canada_page = wikipedia.page("Canada", auto_suggest=False)
 # Print the summary of the page
 print(canada_page.summary)
-# Print the full content of the page
-print(canada_page.content)"""
+# save the summary and content to a text file
+with open("canada_info.txt", "w+") as file:
+    file.write("Summary:\n")
+    file.write(canada_page.summary)
+    file.write("\nContent:\n")
+    file.write(canada_page.content)
+# Print to describe completion details
+print("Information saved in canada_info.txt.")```"""
 CODE_USER_CALIBRATION_MESSAGE2 = """make a powerpoint about Eddington luminosity"""
-CODE_ASSISTANT_CALIBRATION_MESSAGE2 = """import wikipedia
+CODE_ASSISTANT_CALIBRATION_MESSAGE2 = """```python
+import wikipedia
 import pptx
 import openai
 openai.api_key = "your_openai_api_key_here"
@@ -81,9 +86,10 @@ for section in ann_page.sections:
 prs.save("Eddington_Luminosity.pptx")
 
 # Print to confirm goal has been completed
-print("PowerPoint presentation Eddington_Luminosity.pptx created.")"""
+print("PowerPoint presentation Eddington_Luminosity.pptx created.")```"""
 CODE_USER_CALIBRATION_MESSAGE3 = """make my wallpaper a galaxy"""
-CODE_ASSISTANT_CALIBRATION_MESSAGE3 = """import requests
+CODE_ASSISTANT_CALIBRATION_MESSAGE3 = """```python
+import requests
 import ctypes
 import os
 url = "https://api.unsplash.com/search/photos"
@@ -102,7 +108,7 @@ with open("galaxy.jpg", "wb") as f:
 # Change it to a galaxy
 ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.abspath("galaxy.jpg"), 3)
 # Print to confirm goal has been completed
-print("Wallpaper changed to a galaxy.")"""
+print("Wallpaper changed to a galaxy.")```"""
 CONSOLE_OUTPUT_CALIBRATION_MESSAGE = """Canada is a country in North America. Its ten provinces and three territories extend from the Atlantic Ocean to the Pacific Ocean and northward into the Arctic Ocean, covering over 9.98 million square kilometres
 
 == History ==
