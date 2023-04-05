@@ -171,6 +171,11 @@ if __name__ == "__main__":
         always_llm = False
     clear_memory()
     while user_input := input(engshell_PREVIX()):
+        if user_input.startswith("."):
+            cmd = user_input[1:]
+            print_status(f"Executing {cmd}")
+            os.system(cmd)
+            continue
         if user_input == 'clear':
             clear_memory()
             os.system("cls" if WINDOWS else "clear")
