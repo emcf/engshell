@@ -1,12 +1,14 @@
 import openai
+import openai
 import time
 from colorama import Fore, Style
+from io import BytesIO
 import os
 import sys
 from prompts import *
 from keys import OPENAI_KEY
 # uncomment this if you wish to easily use photos from Unsplash API
-# from keys import UNSPLASH_ACCESS_KEY
+from keys import UNSPLASH_ACCESS_KEY
 import subprocess
 import io
 import contextlib
@@ -86,7 +88,7 @@ def LLM(prompt, mode='text'):
 def containerize_code(code_string):
     code_string = code_string.replace('your_openai_api_key_here', OPENAI_KEY)
     # uncomment this if you wish to easily use photos from Unsplash API
-    # code_string = code_string.replace('your_unsplash_access_key_here', UNSPLASH_ACCESS_KEY)
+    code_string = code_string.replace('your_unsplash_access_key_here', UNSPLASH_ACCESS_KEY)
     try:
         output_buffer = io.StringIO()
         with contextlib.redirect_stdout(output_buffer):
@@ -99,11 +101,14 @@ def containerize_code(code_string):
     return True, code_printout
 
 def run_python(goal, debug = False, showcode = False):
-    print_status("compiling...")
+    start = time.time()
+    print_status("compiling")
     returned_code = LLM(goal, mode='code')
     if showcode: 
         print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
-    print_status("running...")
+    end = time.time()
+    print_status(f"took {(end - start):.2f}s; running...")
+    start  = time.time()
     success, output = containerize_code(returned_code)
     attempts = 0
     should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
@@ -127,6 +132,8 @@ def run_python(goal, debug = False, showcode = False):
         should_retry = should_debug or any([(err in output) for err in RETRY_ERRORS])
     if not success:
         raise ValueError(f"failed ({output})")
+    runtime = time.time() - start
+    print_status(f"took {runtime:.2f}");
     return output, returned_code
 
 def clear_memory():
