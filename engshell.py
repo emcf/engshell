@@ -178,6 +178,7 @@ if __name__ == "__main__":
         run_code = True
         while run_code:
             returned_code = LLM(user_prompt, mode='code')
+            memory.append({"role": "assistant", "content": returned_code})
             try:
                 console_output = run_python(returned_code, debug, showcode)
                 #if len(console_output) > MAX_PROMPT:
@@ -185,11 +186,9 @@ if __name__ == "__main__":
                 #    console_output = summarize(console_output)
                 if console_output.strip() == '': console_output = 'done executing.'
                 print_success(console_output)
-                memory.append({"role": "assistant", "content": returned_code})
                 run_code = False
             except Exception as e:
                 error_message = str(e)
                 console_output = error_message
                 run_code = any([err in error_message for err in RETRY_ERRORS])
-                memory.append({"role": "assistant", "content": returned_code})
             memory.append({"role": "system", "content": console_output})
