@@ -1,6 +1,5 @@
 from keys import OPENAI_KEY
 import platform
-import system_info
 
 WINDOWS = platform.system() == "Windows"
 OPERATING_SYSTEM = platform.system()
