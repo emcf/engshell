@@ -1,0 +1,31 @@
+
+    <html>
+    <head>
+        <title>Number Guessing Game</title>
+        <script>
+            var number = 78;
+            var guesses = 0;
+            function guessNumber() {
+                // Get the user's guess from the input field
+                var guess = document.getElementById("guess").value;
+                // Check if the guess is higher or lower than the number
+                if (guess > number) {
+                    alert("Lower!");
+                } else if (guess < number) {
+                    alert("Higher!");
+                } else {
+                    alert("You win! It took you " + guesses + " guesses.");
+                }
+                // Increment the number of guesses
+                guesses++;
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Number Guessing Game</h1>
+        <p>Guess a number between 1 and 100:</p>
+        <input type="text" id="guess">
+        <button onclick="guessNumber()">Guess</button>
+    </body>
+    </html>
+    
