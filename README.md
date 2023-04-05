@@ -21,8 +21,8 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 - record my screen for the next 10 seconds, then save it as an mp4.
 - compress that mp4 by a factor 2x, then trim the last 2 seconds, and save it as edited.mp4.
 - print the file sizes and lengths for the two videos
-- print files in current dir in a table by type
-- generate a cat in a suit image with dall-e, then save it as cat.jpg
+- print files in current directory in a table by type
+- Use DALL-E to generate a picture of a cat wearing a suit, then open my web browser to the picture
 - save text files for the first 10 fibonacci numbers
 - print headlines from CBC
 - make my wallpaper a picture of a rabbit
