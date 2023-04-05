@@ -67,7 +67,7 @@ def LLM(prompt, mode='text'):
             {"role": "user", "content": prompt},
         ]
     elif mode == 'code':
-        messages=memory+[{"role": "user", "content": prompt}]
+        messages=memory
     elif mode == 'install':
         messages=[
             {"role": "system", "content": INSTALL_SYSTEM_CALIBRATION_MESSAGE},
@@ -98,9 +98,8 @@ def containerize_code(code_string):
     code_printout = output_buffer.getvalue()
     return True, code_printout
 
-def run_python(goal, debug = False, showcode = False):
+def run_python(returned_code, debug = False, showcode = False):
     print_status("compiling...")
-    returned_code = LLM(goal, mode='code')
     if showcode: 
         print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
     print_status("running...")
@@ -127,7 +126,7 @@ def run_python(goal, debug = False, showcode = False):
         should_retry = should_debug or any([(err in output) for err in RETRY_ERRORS])
     if not success:
         raise ValueError(f"failed ({output})")
-    return output, returned_code
+    return output
 
 def clear_memory():
     global memory
@@ -175,20 +174,22 @@ if __name__ == "__main__":
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
         user_prompt = USER_MESSAGE(user_input)
+        memory.append({"role": "user", "content": user_prompt})
         run_code = True
         while run_code:
+            returned_code = LLM(user_prompt, mode='code')
             try:
-                console_output, returned_code = run_python(user_prompt, debug, showcode)
+                console_output = run_python(returned_code, debug, showcode)
                 #if len(console_output) > MAX_PROMPT:
                 #    print_status('output too large, summarizing...')
                 #    console_output = summarize(console_output)
-                if console_output == '': console_output = 'done executing.'
+                if console_output.strip() == '': console_output = 'done executing.'
                 print_success(console_output)
-                memory.append({"role": "user", "content": user_prompt})
                 memory.append({"role": "assistant", "content": returned_code})
-                memory.append({"role": "system", "content": console_output})
                 run_code = False
             except Exception as e:
                 error_message = str(e)
-                print(error_message)
+                console_output = error_message
                 run_code = any([err in error_message for err in RETRY_ERRORS])
+                memory.append({"role": "assistant", "content": returned_code})
+            memory.append({"role": "system", "content": console_output})

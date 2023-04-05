@@ -14,8 +14,7 @@ INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large langua
 Return only the command and nothing else."""
 INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} pip3 command I can install {package}. Please do not explain, return only the single command to install it."""
 CONGNITIVE_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant. Please give your response to the user's goal."""
-CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal by importing the function LLM(prompt: str) -> str from engshell.py.
-It is pre-defined in engshell.py, so you do not need to define this function.
+CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal. Use openai.Completion.create with text-davinci-003.
 Don't forget to engineer the prompt to the LLM so it returns relevant answers."""
 USER_MESSAGE = lambda goal: f"""Write {OPERATING_SYSTEM} python3 code so I can achieve my goal by running my code. Please do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result. """
 CODE_USER_CALIBRATION_MESSAGE = """get information about canada"""
