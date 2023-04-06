@@ -8,7 +8,12 @@ from keys import *
 import subprocess
 import io
 import contextlib
-import platform
+from io import BytesIO
+import soundfile as sf                                                      
+import keras                                                                
+from keras.models import Sequential                                         
+from keras.layers import Dense, Dropout, Activation                         
+from keras.optimizers import SGD   
 
 WINDOWS = platform.system() == "Windows"
 openai.api_key = OPENAI_KEY
