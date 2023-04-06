@@ -102,10 +102,10 @@ def containerize_code(code_string):
     return True, code_printout
 
 def run_python(returned_code, debug = False, showcode = False):
-    print_status("compiling...")
+    #print_status("compiling...")
     if showcode: 
         print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
-    print_status("running...")
+    #print_status("running...")
     success, output = containerize_code(returned_code)
     attempts = 0
     should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
