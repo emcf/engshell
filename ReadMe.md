@@ -5,15 +5,15 @@ christian.scladetsch@gmail.com
 ## How to use:
 
 - install requirements: `pip install -r requirements.txt`
-- create `keys.py` in the engshell directory to define `OPENAI_KEY`
-- run `python engshell.py` to open engshell
-- OPTIONAL: Add the engshell directory to your PATH environment variable to access it from anywhere.
+- create `keys.py` in the gptshell directory to define `OPENAI_KEY`
+- run `python gptshell.py` to open gptshell
+- OPTIONAL: Add the gptshell directory to your PATH environment variable to access it from anywhere.
 
 ## Notes:
 - `--llm` encourages LLM queries from within the code execution.
-- `--debug` allows engshell to debug its own code if it fails.
+- `--debug` allows gptshell to debug its own code if it fails.
 - `--showcode` shows the code being executed.
-- `clear` resets engshell's memory, along with the console.
+- `clear` resets gptshell's memory, along with the console.
 - starting a prompt with `.` immediately executes that in the outer system shell.
 
 ## Examples
