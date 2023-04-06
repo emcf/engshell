@@ -19,7 +19,7 @@ WINDOWS = platform.system() == "Windows"
 openai.api_key = OPENAI_KEY
 MAX_PROMPT = 20*1024
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
-engshell_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "engshell" + Style.RESET_ALL + '>'
+engshell_PREVIX = lambda: Style.RESET_ALL + Fore.YELLOW + ' δ ' + Fore.WHITE
 API_CALLS_PER_MIN = 50
 VERBOSE = False
 MAX_DEBUG_ATTEMPTS = 2
@@ -167,10 +167,16 @@ if __name__ == "__main__":
         always_llm = False
     clear_memory()
     while user_input := input(engshell_PREVIX()):
+
         if user_input == 'clear':
             clear_memory()
             os.system("cls" if WINDOWS else "clear")
             continue
+
+        if user_input.startswith("."):
+            os.system(user_input[1:])
+            continue
+
         if ('--llm' in user_input) or always_llm: user_input += CONGNITIVE_USER_MESSAGE
         debug = ('--debug' in user_input) or always_debug
         showcode = ('--showcode' in user_input) or always_showcode

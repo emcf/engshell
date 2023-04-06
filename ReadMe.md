@@ -13,6 +13,7 @@ christian.scladetsch@gmail.com
 - `--debug` allows engshell to debug its own code if it fails.
 - `--showcode` shows the code being executed.
 - `clear` resets engshell's memory, along with the console.
+- starting a prompt with `.` immediately executes that in the outer system shell.
 
 ## Examples
 ### 🔧 General:
