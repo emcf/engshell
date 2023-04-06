@@ -19,7 +19,7 @@ WINDOWS = platform.system() == "Windows"
 openai.api_key = OPENAI_KEY
 MAX_PROMPT = 20*1024
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
-engshell_PREVIX = lambda: Style.RESET_ALL + Fore.YELLOW + ' δ ' + Fore.WHITE
+engshell_PREVIX = lambda: Style.RESET_ALL + Fore.YELLOW + 'δ ' + Fore.WHITE
 API_CALLS_PER_MIN = 50
 VERBOSE = False
 MAX_DEBUG_ATTEMPTS = 2
