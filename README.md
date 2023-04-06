@@ -25,8 +25,8 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 - Use DALL-E to generate a picture of a cat wearing a suit, then open my web browser to the picture
 - save text files for the first 10 fibonacci numbers
 - print headlines from CBC
-- make my wallpaper a picture of a rabbit
-- make a pie chart of the total size each file type is taking up in this folder
+- print a cake recipe, then open up amazon to where i can buy these ingredients. open each ingredient in a new tab
+- make my wallpaper a picture of a castle (requires UNSPLASH_API_KEY to be set)
 ### 🧠 Complexity Tests:
 - solve d^2y/dx^2 = sin(2x) + x with sympy --debug
 - find the second derivative of C1 + C2*x + x\*\*3/6 - sin(2*x)/4 with respect to x --debug
