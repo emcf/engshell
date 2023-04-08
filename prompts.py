@@ -1,11 +1,14 @@
 from keys import OPENAI_KEY
 import platform
+import os
 
+USERNAME = os.getlogin()
 OPERATING_SYSTEM = platform.system()
 PYTHON_VERSION = platform.python_version()
 # in need of good prompt engineering
 ENDOFTEXT = "<|ENDOFTEXT|>"
-CODE_SYSTEM_CALIBRATION_MESSAGE= ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user can run it to solve their problem. Return the code in ``` blocks, and give no explanation. Do not return any text that is not Python code.
+def CODE_SYSTEM_CALIBRATION_MESSAGE(CURRENT_DIR):
+    return ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user (username: {USERNAME}) can run it to solve their problem. Return the code in ``` blocks, and give no explanation. The current directory is {CURRENT_DIR}. Do not return any text that is not Python code.
 Import all needed requirements."""
 DEBUG_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user can run it to solve their problem. For example, if the error was "No such file or directory", then you would download the necessary file or create the directory. Explain your reasoning in plain english, then provide the corrected code. Give the entire code all in one ``` block."""
 INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.

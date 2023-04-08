@@ -36,11 +36,22 @@ def print_err(status):
     print(Style.RESET_ALL + Fore.RED + status + Style.RESET_ALL)
 
 def clean_code_string(response_content):
+    lines = response_content.split("\n")
+    if lines[0].startswith("!"):
+        lines.pop(0)
+    response_content = "\n".join(lines)
+
     split_response_content = response_content.split('```')
     if len(split_response_content) > 1:
         response_content = split_response_content[1]
     for code_languge in ['python', 'bash']:
         if response_content[:len(code_languge)]==code_languge: response_content = response_content[len(code_languge)+1:] # remove python+newline blocks
+    return response_content.replace('`','')
+
+def clean_install_string(response_content):
+    split_response_content = response_content.split('`')
+    if len(split_response_content) > 1:
+        response_content = split_response_content[1]
     return response_content.replace('`','')
 
 def summarize(text):
@@ -82,7 +93,8 @@ def LLM(prompt, mode='text'):
       temperature = 0.0
     )
     response_content = response.choices[0].message.content
-    if mode == 'code': response_content = clean_code_string(response_content)
+    if mode == 'code' or mode == 'debug': response_content = clean_code_string(response_content)
+    elif mode == 'install': response_content = clean_install_string(response_content)
     return response_content
 
 def containerize_code(code_string):
@@ -135,7 +147,7 @@ def run_python(returned_code, debug = False, showcode = False):
 def clear_memory():
     global memory
     memory = [
-            {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
+            {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE(CURRENT_DIR = os.getcwd())},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
             {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE},
