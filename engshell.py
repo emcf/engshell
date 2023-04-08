@@ -147,7 +147,7 @@ def run_python(returned_code, debug = False, showcode = False):
 def clear_memory():
     global memory
     memory = [
-            {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE(CURRENT_DIR = os.getcwd())},
+            {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
             {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE},
             {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
             {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE},
@@ -186,7 +186,7 @@ if __name__ == "__main__":
         user_input = user_input.replace('--llm','')
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
-        user_prompt = USER_MESSAGE(user_input)
+        user_prompt = USER_MESSAGE(user_input, current_dir = os.getcwd())
         memory.append({"role": "user", "content": user_prompt})
         run_code = True
         while run_code:

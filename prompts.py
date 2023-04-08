@@ -7,8 +7,7 @@ OPERATING_SYSTEM = platform.system()
 PYTHON_VERSION = platform.python_version()
 # in need of good prompt engineering
 ENDOFTEXT = "<|ENDOFTEXT|>"
-def CODE_SYSTEM_CALIBRATION_MESSAGE(CURRENT_DIR):
-    return ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user (username: {USERNAME}) can run it to solve their problem. Return the code in ``` blocks, and give no explanation. The current directory is {CURRENT_DIR}. Do not return any text that is not Python code.
+CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user (username: {USERNAME}) can run it to solve their problem. Return the code in ``` blocks, and give no explanation. Do not return any text that is not Python code.
 Import all needed requirements."""
 DEBUG_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user can run it to solve their problem. For example, if the error was "No such file or directory", then you would download the necessary file or create the directory. Explain your reasoning in plain english, then provide the corrected code. Give the entire code all in one ``` block."""
 INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.
@@ -17,7 +16,9 @@ INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} Python {
 LLM_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant. Please give your response to the user's goal."""
 CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal. Use openai.Completion.create with text-davinci-003.
 Don't forget to engineer the prompt to the language model so it returns relevant answers."""
-USER_MESSAGE = lambda goal: f"""Write {OPERATING_SYSTEM} python {PYTHON_VERSION} code so I can achieve my goal by running my code. Please do not explain, return only the code. My goal: [{goal}]. Don't forget to print the final result. """
+def USER_MESSAGE(goal, current_dir): return f"""(USER: {USERNAME})
+(DIRECTORY: {current_dir})
+Write {OPERATING_SYSTEM} python {PYTHON_VERSION} code so I can achieve my goal by running my code. Do not explain anything. Return only the code. My goal: [{goal}]. Don't forget to print the final result. """
 def DEBUG_MESSAGE(code, error):
     return f"""```python
 {code}
