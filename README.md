@@ -28,6 +28,7 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 - print a cake recipe, then open up amazon to where i can buy these ingredients. open each ingredient in a new tab
 - make my wallpaper a picture of a castle (requires UNSPLASH_API_KEY to be set)
 ### 🧠 Complexity Tests:
+- get info about france economy from wikipedia, then make a word doc about it --llm
 - solve d^2y/dx^2 = sin(2x) + x with sympy --debug
 - find the second derivative of C1 + C2*x + x\*\*3/6 - sin(2*x)/4 with respect to x --debug
 - make a powerpoint presentation about Eddington Luminosity based on the wikipedia sections --debug -llm
