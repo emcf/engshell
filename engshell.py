@@ -87,10 +87,10 @@ def LLM(prompt, mode='text'):
             {"role": "user", "content": prompt},
         ]
     response = openai.ChatCompletion.create(
-      #model="gpt-4",
-      model="gpt-3.5-turbo-0301",
+      model="gpt-4",
+      #model="gpt-3.5-turbo-0301",
       messages=messages,
-      temperature = 0.0
+      temperature = 1.2
     )
     response_content = response.choices[0].message.content
     if mode == 'code' or mode == 'debug': response_content = clean_code_string(response_content)
