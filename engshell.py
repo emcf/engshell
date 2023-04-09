@@ -11,6 +11,10 @@ import contextlib
 import platform
 
 openai.api_key = OPENAI_KEY
+try:
+    openai.proxy = OPENAI_PROXY
+except NameError:
+    openai.proxy = None
 MAX_PROMPT = 20480
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
 engshell_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "engshell" + Style.RESET_ALL + '>'
