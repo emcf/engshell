@@ -7,6 +7,7 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 ## How to use:
 - install requirements: `pip install -r requirements.txt`
 - create `keys.py` in the engshell directory to define `OPENAI_KEY`
+- - [optional] Define `OPENAI_PROXY` in the `keys.py` file to make the connection to the openai server use a proxy, supporting `str` and `dict` types(https://github.com/openai/openai-python/blob/aa133ce3a883e2957aa1e0111ee27dfef986e787/openai/api_requestor.py#L64)
 - run `python engshell.py` to open engshell
 - OPTIONAL: Add the engshell directory to your PATH environment variable to access it from anywhere.
 
