@@ -9,6 +9,7 @@ import subprocess
 import io
 import contextlib
 import platform
+import traceback
 
 openai.api_key = OPENAI_KEY
 MAX_PROMPT = 20480
@@ -16,7 +17,7 @@ CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
 engshell_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "engshell" + Style.RESET_ALL + '>'
 API_CALLS_PER_MIN = 50
 VERBOSE = False
-MAX_DEBUG_ATTEMPTS = 2
+MAX_DEBUG_ATTEMPTS = 3
 RETRY_ERRORS = ["The server had an error while processing your request. Sorry about that!"]
 memory = []
 
@@ -35,10 +36,15 @@ def print_err(status):
     print_console_prompt()
     print(Style.RESET_ALL + Fore.RED + status + Style.RESET_ALL)
 
+def print_code(status):
+    print_console_prompt()
+    print(Style.RESET_ALL + Fore.LIGHTBLACK_EX + status + Style.RESET_ALL)
+
 def clean_code_string(response_content):
     lines = response_content.split("\n")
-    if lines[0].startswith("!"):
-        lines.pop(0)
+    for i, line in enumerate(lines):
+        if line.startswith("!pip"):
+            lines.pop(i)
     response_content = "\n".join(lines)
 
     split_response_content = response_content.split('```')
@@ -52,7 +58,7 @@ def clean_install_string(response_content):
     split_response_content = response_content.split('`')
     if len(split_response_content) > 1:
         response_content = split_response_content[1]
-    return response_content.replace('`','')
+    return response_content.replace('`','').replace('!', '')
 
 def summarize(text):
     summarized = text
@@ -104,11 +110,13 @@ def containerize_code(code_string):
     try:
         output_buffer = io.StringIO()
         with contextlib.redirect_stdout(output_buffer):
-            exec(code_string,globals())
+            exec(code_string, globals())
     except Exception as e:
-        error_msg = str(e)
-        print('got error message:', error_msg)
-        return False, error_msg
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        tb = traceback.extract_tb(exc_traceback)
+        filename, line, func, text = tb[-1]
+        error_msg = f"{exc_type.__name__}: {str(e)}"
+        return False, f'Error: {error_msg}. Getting the error from function: {func} (line: {line})'
     code_printout = output_buffer.getvalue()
     return True, code_printout
 
@@ -128,13 +136,15 @@ def run_python(returned_code, debug = False, showcode = False):
             print_status('installing: ' + output)
             prompt = INSTALL_USER_MESSAGE(output)
             returned_command = LLM(prompt, mode='install')
+            if showcode: 
+                print_code(returned_command, end = '' if returned_command[-1] == '\n' else '\n')
             os.system(returned_command)
         elif should_debug:
             print_status('debugging: ' + output)
             prompt = DEBUG_MESSAGE(returned_code, output)
             returned_code = LLM(prompt, mode='debug')
             if showcode: 
-                print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
+                print_code(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
         returned_code = clean_code_string(returned_code)
         success, output = containerize_code(returned_code)
         attempts += 1
