@@ -109,14 +109,15 @@ def containerize_code(code_string):
     try:
         output_buffer = io.StringIO()
         with contextlib.redirect_stdout(output_buffer):
-            exec(code_string,globals())
+            exec(code_string, globals())
     except Exception as e:
-        error_msg = str(e)
-        print('got error message:', error_msg)
-        return False, error_msg
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        tb = traceback.extract_tb(exc_traceback)
+        filename, line, func, text = tb[-1]
+        error_msg = f"{exc_type.__name__}: {str(e)}"
+        return False, f'Error: {error_msg}. Getting the error from function: {func} (line: {line})'
     code_printout = output_buffer.getvalue()
     return True, code_printout
-
 
 def run_python(returned_code, debug = False, showcode = False, gpt4 = False):
     print_status("compiling...")
@@ -181,6 +182,7 @@ if __name__ == "__main__":
         user_input = user_input.replace('--llm','')
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
+        user_input = user_input.replace('--gpt4','')
         user_prompt = USER_MESSAGE(user_input, current_dir = os.getcwd())
         memory.append({"role": "user", "content": user_prompt})
         run_code = True
