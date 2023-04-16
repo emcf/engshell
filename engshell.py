@@ -65,7 +65,7 @@ def summarize(text):
     raise NotImplementedError("summarize(text) not yet implemented")
     return summarized
 
-def LLM(prompt, mode='text'):
+def LLM(prompt, mode='text', gpt4 = False):
     global memory
     if len(prompt) > MAX_PROMPT: 
         print_status('prompt too large, summarizing...')
@@ -93,8 +93,7 @@ def LLM(prompt, mode='text'):
             {"role": "user", "content": prompt},
         ]
     response = openai.ChatCompletion.create(
-      #model="gpt-4",
-      model="gpt-3.5-turbo-0301",
+      model="gpt-4" if gpt4 else "gpt-3.5-turbo-0301",
       messages=messages,
       temperature = 0.0
     )
@@ -110,17 +109,16 @@ def containerize_code(code_string):
     try:
         output_buffer = io.StringIO()
         with contextlib.redirect_stdout(output_buffer):
-            exec(code_string, globals())
+            exec(code_string,globals())
     except Exception as e:
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        tb = traceback.extract_tb(exc_traceback)
-        filename, line, func, text = tb[-1]
-        error_msg = f"{exc_type.__name__}: {str(e)}"
-        return False, f'Error: {error_msg}. Getting the error from function: {func} (line: {line})'
+        error_msg = str(e)
+        print('got error message:', error_msg)
+        return False, error_msg
     code_printout = output_buffer.getvalue()
     return True, code_printout
 
-def run_python(returned_code, debug = False, showcode = False):
+
+def run_python(returned_code, debug = False, showcode = False, gpt4 = False):
     print_status("compiling...")
     if showcode: 
         print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
@@ -129,22 +127,19 @@ def run_python(returned_code, debug = False, showcode = False):
     success, output = containerize_code(returned_code)
     attempts = 0
     should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
-    should_install = (output is not None) and ('No module named' in output)
+    should_install = (output is not None) and ('No module named' in output or 'ModuleNotFoundError' in output)
     should_retry = should_debug or should_install or ((output is not None) and any([(err in output) for err in RETRY_ERRORS]))
     while should_retry:
         if should_install:
             print_status('installing: ' + output)
             prompt = INSTALL_USER_MESSAGE(output)
-            returned_command = LLM(prompt, mode='install')
-            if showcode: 
-                print_code(returned_command, end = '' if returned_command[-1] == '\n' else '\n')
+            returned_command = LLM(prompt, mode='install', gpt4 = gpt4)
             os.system(returned_command)
         elif should_debug:
             print_status('debugging: ' + output)
             prompt = DEBUG_MESSAGE(returned_code, output)
-            returned_code = LLM(prompt, mode='debug')
-            if showcode: 
-                print_code(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
+            returned_code = LLM(prompt, mode='debug', gpt4 = gpt4)
+        print_status('rerunning...')
         returned_code = clean_code_string(returned_code)
         success, output = containerize_code(returned_code)
         attempts += 1
@@ -169,21 +164,10 @@ def clear_memory():
 
 if __name__ == "__main__":
     if os.name == 'nt': os.system('')
-    if '--showcode' in sys.argv:
-        print("showcode argument set to enabled")
-        always_showcode = True
-    else:
-        always_showcode = False
-    if '--debug' in sys.argv:
-        print("debug argument set to enabled")
-        always_debug = True
-    else:
-        always_debug = False
-    if '--llm' in sys.argv:
-        print("llm argument set to enabled")
-        always_llm = True
-    else:
-        always_llm = False
+    always_showcode = '--showcode' in sys.argv
+    always_gpt4 = '--gpt4' in sys.argv
+    always_debug = '--debug' in sys.argv
+    always_llm = '--llm' in sys.argv
     clear_memory()
     while user_input := input(engshell_PREVIX()):
         if user_input == 'clear':
@@ -193,6 +177,7 @@ if __name__ == "__main__":
         if ('--llm' in user_input) or always_llm: user_input += CONGNITIVE_USER_MESSAGE
         debug = ('--debug' in user_input) or always_debug
         showcode = ('--showcode' in user_input) or always_showcode
+        gpt4 = ('--gpt4' in user_input) or always_gpt4
         user_input = user_input.replace('--llm','')
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
@@ -200,10 +185,10 @@ if __name__ == "__main__":
         memory.append({"role": "user", "content": user_prompt})
         run_code = True
         while run_code:
-            returned_code = LLM(user_prompt, mode='code')
+            returned_code = LLM(user_prompt, mode='code', gpt4 = gpt4)
             memory.append({"role": "assistant", "content": returned_code})
             try:
-                console_output = run_python(returned_code, debug, showcode)
+                console_output = run_python(returned_code, debug, showcode, gpt4)
                 #if len(console_output) > MAX_PROMPT:
                 #    print_status('output too large, summarizing...')
                 #    console_output = summarize(console_output)
