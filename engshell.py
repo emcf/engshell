@@ -171,12 +171,22 @@ if __name__ == "__main__":
     always_debug = '--debug' in sys.argv
     always_llm = '--llm' in sys.argv
     clear_memory()
-    while user_input := input(engshell_PREVIX()):
-        try:
+
+    while True:  # broken if user types "exit"
+        try:  # catch KeyboardExceptions for standard shell behavior
+            user_input = input(engshell_PREVIX())
+
+            if len(user_input) == 0:  # standard shell behavior on no input
+                continue
+
+            if user_input == "exit":
+                break
+
             if user_input == 'clear':
                 clear_memory()
                 os.system("cls" if platform.system() == "Windows" else "clear")
                 continue
+
             if ('--llm' in user_input) or always_llm: user_input += CONGNITIVE_USER_MESSAGE
             debug = ('--debug' in user_input) or always_debug
             showcode = ('--showcode' in user_input) or always_showcode
@@ -205,5 +215,6 @@ if __name__ == "__main__":
                     run_code = any([err in error_message for err in RETRY_ERRORS])
                 if len(console_output) < MAX_PROMPT:
                     memory.append({"role": "system", "content": console_output})
-        except KeyboardInterrupt:
-            print("")
+
+        except KeyboardInterrupt:  # ^C standard shell behavior
+            print("")  #newline so the next input line isn't shifted
