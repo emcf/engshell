@@ -172,6 +172,8 @@ if __name__ == "__main__":
     always_llm = '--llm' in sys.argv
     clear_memory()
 
+    print("Type \"exit\" to exit the shell.")
+
     while True:  # broken if user types "exit"
         try:  # catch KeyboardExceptions for standard shell behavior
             user_input = input(engshell_PREVIX())
