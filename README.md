@@ -11,9 +11,10 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 - OPTIONAL: Add the engshell directory to your PATH environment variable to access it from anywhere. For Windows users, change the second line in `es.bat` to your install location, then call engshell with `es`.
 
 ## Notes:
-- `--llm` encourages LLM queries from within the code execution.
 - `--debug` allows engshell to debug its own code if it fails.
 - `--showcode` shows the code being executed.
+- `--gpt4` to use GPT-4 as the core model
+- `--llm` encourages LLM queries from within the code execution.
 - `clear` resets engshell's memory, along with the console.
 
 ## Examples
