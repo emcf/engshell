@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import openai
 import time
 from colorama import Fore, Style
@@ -170,36 +171,52 @@ if __name__ == "__main__":
     always_debug = '--debug' in sys.argv
     always_llm = '--llm' in sys.argv
     clear_memory()
-    while user_input := input(engshell_PREVIX()):
-        if user_input == 'clear':
-            clear_memory()
-            os.system("cls" if platform.system() == "Windows" else "clear")
-            continue
-        if ('--llm' in user_input) or always_llm: user_input += CONGNITIVE_USER_MESSAGE
-        debug = ('--debug' in user_input) or always_debug
-        showcode = ('--showcode' in user_input) or always_showcode
-        gpt4 = ('--gpt4' in user_input) or always_gpt4
-        user_input = user_input.replace('--llm','')
-        user_input = user_input.replace('--debug','')
-        user_input = user_input.replace('--showcode','')
-        user_input = user_input.replace('--gpt4','')
-        user_prompt = USER_MESSAGE(user_input, current_dir = os.getcwd())
-        memory.append({"role": "user", "content": user_prompt})
-        run_code = True
-        while run_code:
-            returned_code = LLM(user_prompt, mode='code', gpt4 = gpt4)
-            memory.append({"role": "assistant", "content": returned_code})
-            try:
-                console_output = run_python(returned_code, debug, showcode, gpt4)
-                #if len(console_output) > MAX_PROMPT:
-                #    print_status('output too large, summarizing...')
-                #    console_output = summarize(console_output)
-                if console_output.strip() == '': console_output = 'done executing.'
-                print_success(console_output)
-                run_code = False
-            except Exception as e:
-                error_message = str(e)
-                console_output = error_message
-                run_code = any([err in error_message for err in RETRY_ERRORS])
-            if len(console_output) < MAX_PROMPT:
-                memory.append({"role": "system", "content": console_output})
+
+    print("Type \"exit\" to exit the shell.")
+
+    while True:  # broken if user types "exit"
+        try:  # catch KeyboardExceptions for standard shell behavior
+            user_input = input(engshell_PREVIX())
+
+            if len(user_input) == 0:  # standard shell behavior on no input
+                continue
+
+            if user_input == "exit":
+                break
+
+            if user_input == 'clear':
+                clear_memory()
+                os.system("cls" if platform.system() == "Windows" else "clear")
+                continue
+
+            if ('--llm' in user_input) or always_llm: user_input += CONGNITIVE_USER_MESSAGE
+            debug = ('--debug' in user_input) or always_debug
+            showcode = ('--showcode' in user_input) or always_showcode
+            gpt4 = ('--gpt4' in user_input) or always_gpt4
+            user_input = user_input.replace('--llm','')
+            user_input = user_input.replace('--debug','')
+            user_input = user_input.replace('--showcode','')
+            user_input = user_input.replace('--gpt4','')
+            user_prompt = USER_MESSAGE(user_input, current_dir = os.getcwd())
+            memory.append({"role": "user", "content": user_prompt})
+            run_code = True
+            while run_code:
+                returned_code = LLM(user_prompt, mode='code', gpt4 = gpt4)
+                memory.append({"role": "assistant", "content": returned_code})
+                try:
+                    console_output = run_python(returned_code, debug, showcode, gpt4)
+                    #if len(console_output) > MAX_PROMPT:
+                    #    print_status('output too large, summarizing...')
+                    #    console_output = summarize(console_output)
+                    if console_output.strip() == '': console_output = 'done executing.'
+                    print_success(console_output)
+                    run_code = False
+                except Exception as e:
+                    error_message = str(e)
+                    console_output = error_message
+                    run_code = any([err in error_message for err in RETRY_ERRORS])
+                if len(console_output) < MAX_PROMPT:
+                    memory.append({"role": "system", "content": console_output})
+
+        except KeyboardInterrupt:  # ^C standard shell behavior
+            print("")  #newline so the next input line isn't shifted
