@@ -12,10 +12,10 @@ import platform
 import traceback
 
 openai.api_key = OPENAI_KEY
-MAX_PROMPT = 20480
+CHARS_PER_TOKEN = 4
+MAX_PROMPT = 16000 * CHARS_PER_TOKEN
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
 engshell_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "engshell" + Style.RESET_ALL + '>'
-API_CALLS_PER_MIN = 50
 VERBOSE = False
 MAX_DEBUG_ATTEMPTS = 3
 RETRY_ERRORS = ["The server had an error while processing your request. Sorry about that!"]
@@ -64,11 +64,6 @@ def LLM(prompt, mode='text', gpt4 = False):
     global memory
     if len(prompt) > MAX_PROMPT: 
         raise ValueError(f'prompt ({len(prompt)}) too large (max {MAX_PROMPT})')
-    time.sleep(1.0/API_CALLS_PER_MIN)
-    moderation_resp = openai.Moderation.create(input=prompt)
-    if moderation_resp.results[0].flagged:
-        raise ValueError(f'prompt ({prompt}) flagged by moderation endpoint')
-    time.sleep(1.0/API_CALLS_PER_MIN)
     if mode == 'text':
         messages=[
             {"role": "system", "content": LLM_SYSTEM_CALIBRATION_MESSAGE},
