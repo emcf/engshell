@@ -1,4 +1,4 @@
-import openai
+from openai import OpenAI
 import time
 from colorama import Fore, Style
 import os
@@ -11,7 +11,7 @@ import contextlib
 import platform
 import traceback
 
-openai.api_key = OPENAI_KEY
+openai_client = OpenAI(api_key=OPENAI_KEY)
 CHARS_PER_TOKEN = 4
 MAX_PROMPT = 16000 * CHARS_PER_TOKEN
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
@@ -81,12 +81,12 @@ def LLM(prompt, mode='text', gpt4 = False):
             {"role": "system", "content": INSTALL_SYSTEM_CALIBRATION_MESSAGE},
             {"role": "user", "content": prompt},
         ]
-    response = openai.ChatCompletion.create(
-      model="gpt-4-1106-preview" if gpt4 else "gpt-3.5-turbo-1106",
-      messages=messages,
-      temperature = 0.0
+    response = openai_client.chat.completions.create(
+        model="gpt-4-1106-preview" if gpt4 else "gpt-3.5-turbo-1106",
+        messages=messages,
     )
     response_content = response.choices[0].message.content
+
     if mode == 'code' or mode == 'debug': response_content = clean_code_string(response_content)
     elif mode == 'install': response_content = clean_install_string(response_content)
     return response_content
