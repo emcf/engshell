@@ -60,16 +60,10 @@ def clean_install_string(response_content):
         response_content = split_response_content[1]
     return response_content.replace('`','').replace('!', '')
 
-def summarize(text):
-    summarized = text
-    raise NotImplementedError("summarize(text) not yet implemented")
-    return summarized
-
 def LLM(prompt, mode='text', gpt4 = False):
     global memory
     if len(prompt) > MAX_PROMPT: 
-        print_status('prompt too large, summarizing...')
-        prompt = summarize(prompt)
+        raise ValueError(f'prompt ({len(prompt)}) too large (max {MAX_PROMPT})')
     time.sleep(1.0/API_CALLS_PER_MIN)
     moderation_resp = openai.Moderation.create(input=prompt)
     if moderation_resp.results[0].flagged:
@@ -93,7 +87,7 @@ def LLM(prompt, mode='text', gpt4 = False):
             {"role": "user", "content": prompt},
         ]
     response = openai.ChatCompletion.create(
-      model="gpt-4" if gpt4 else "gpt-3.5-turbo-0301",
+      model="gpt-4-1106-preview" if gpt4 else "gpt-3.5-turbo-1106",
       messages=messages,
       temperature = 0.0
     )
@@ -191,9 +185,6 @@ if __name__ == "__main__":
             memory.append({"role": "assistant", "content": returned_code})
             try:
                 console_output = run_python(returned_code, debug, showcode, gpt4)
-                #if len(console_output) > MAX_PROMPT:
-                #    print_status('output too large, summarizing...')
-                #    console_output = summarize(console_output)
                 if console_output.strip() == '': console_output = 'done executing.'
                 print_success(console_output)
                 run_code = False

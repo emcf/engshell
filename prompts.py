@@ -1,6 +1,4 @@
-from keys import OPENAI_KEY
 import platform
-import os
 import getpass
 
 USERNAME = getpass.getuser()
