@@ -13,7 +13,6 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 ## Notes:
 - `--debug` allows engshell to debug its own code if it fails.
 - `--showcode` shows the code being executed.
-- `--gpt4` to use GPT-4 as the core model
 - `--llm` encourages LLM queries from within the code execution.
 - `clear` resets engshell's memory, along with the console.
 
@@ -21,7 +20,7 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 ### 🔧 General:
 - record my screen for the next 10 seconds, then save it as an mp4.
 - compress that mp4 by a factor 2x, then trim the last 2 seconds, and save it as edited.mp4.
-- check the weather, then ask gpt3 what i should wear today
+- check the weather in Toronto
 - print files in current directory in a table by type
 - Use DALL-E to generate a picture of a cat wearing a suit, then open my web browser to the picture
 - save text files for the first 10 fibonacci numbers
