@@ -60,7 +60,7 @@ def clean_install_string(response_content):
         response_content = split_response_content[1]
     return response_content.replace('`','').replace('!', '')
 
-def LLM(prompt, mode='text', gpt4 = False):
+def LLM(prompt, mode='text'):
     global memory
     if len(prompt) > MAX_PROMPT: 
         raise ValueError(f'prompt ({len(prompt)}) too large (max {MAX_PROMPT})')
@@ -82,7 +82,7 @@ def LLM(prompt, mode='text', gpt4 = False):
             {"role": "user", "content": prompt},
         ]
     response = openai_client.chat.completions.create(
-        model="gpt-4-1106-preview" if gpt4 else "gpt-3.5-turbo-1106",
+        model="gpt-4-turbo-preview",
         messages=messages,
     )
     response_content = response.choices[0].message.content
@@ -108,7 +108,7 @@ def containerize_code(code_string):
     code_printout = output_buffer.getvalue()
     return True, code_printout
 
-def run_python(returned_code, debug = False, showcode = False, gpt4 = False):
+def run_python(returned_code, debug = False, showcode = False):
     print_status("compiling...")
     if showcode: 
         print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
@@ -123,12 +123,12 @@ def run_python(returned_code, debug = False, showcode = False, gpt4 = False):
         if should_install:
             print_status('installing: ' + output)
             prompt = INSTALL_USER_MESSAGE(output)
-            returned_command = LLM(prompt, mode='install', gpt4 = gpt4)
+            returned_command = LLM(prompt, mode='install')
             os.system(returned_command)
         elif should_debug:
             print_status('debugging: ' + output)
             prompt = DEBUG_MESSAGE(returned_code, output)
-            returned_code = LLM(prompt, mode='debug', gpt4 = gpt4)
+            returned_code = LLM(prompt, mode='debug')
         print_status('rerunning...')
         returned_code = clean_code_string(returned_code)
         success, output = containerize_code(returned_code)
@@ -155,7 +155,6 @@ def clear_memory():
 if __name__ == "__main__":
     if os.name == 'nt': os.system('')
     always_showcode = '--showcode' in sys.argv
-    always_gpt4 = '--gpt4' in sys.argv
     always_debug = '--debug' in sys.argv
     always_llm = '--llm' in sys.argv
     clear_memory()
@@ -167,19 +166,17 @@ if __name__ == "__main__":
         if ('--llm' in user_input) or always_llm: user_input += CONGNITIVE_USER_MESSAGE
         debug = ('--debug' in user_input) or always_debug
         showcode = ('--showcode' in user_input) or always_showcode
-        gpt4 = ('--gpt4' in user_input) or always_gpt4
         user_input = user_input.replace('--llm','')
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
-        user_input = user_input.replace('--gpt4','')
         user_prompt = USER_MESSAGE(user_input, current_dir = os.getcwd())
         memory.append({"role": "user", "content": user_prompt})
         run_code = True
         while run_code:
-            returned_code = LLM(user_prompt, mode='code', gpt4 = gpt4)
+            returned_code = LLM(user_prompt, mode='code')
             memory.append({"role": "assistant", "content": returned_code})
             try:
-                console_output = run_python(returned_code, debug, showcode, gpt4)
+                console_output = run_python(returned_code, debug, showcode)
                 if console_output.strip() == '': console_output = 'done executing.'
                 print_success(console_output)
                 run_code = False
