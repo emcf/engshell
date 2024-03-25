@@ -6,9 +6,8 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 
 ## How to use:
 - install requirements with the command `pip install -r requirements.txt`
-- create a file named `keys.py` in the engshell directory. It must contain one line, `OPENAI_KEY="your_api_key"`
+- create a `keys.py` file. It must contain one line, `OPENAI_KEY="your_api_key"`
 - run `python engshell.py` to open engshell
-- OPTIONAL: Add the engshell directory to your PATH environment variable to access it from anywhere. For Windows users, change the second line in `es.bat` to your install location, then call engshell with `es`.
 
 ## Notes:
 - `--debug` allows engshell to debug its own code if it fails.
