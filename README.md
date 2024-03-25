@@ -19,7 +19,7 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 ## Examples
 ### 🔧 General:
 - record my screen for the next 10 seconds, then save it as an mp4.
-- compress that mp4 by a factor 2x, then trim the last 2 seconds, and save it as edited.mp4.
+- examine the files in the current directory, then organize them into new folders
 - check the weather in Toronto
 - print files in current directory in a table by type
 - Use DALL-E to generate a picture of a cat wearing a suit, then open my web browser to the picture
