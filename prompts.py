@@ -6,15 +6,14 @@ OPERATING_SYSTEM = platform.system()
 PYTHON_VERSION = platform.python_version()
 # in need of good prompt engineering
 ENDOFTEXT = "<|ENDOFTEXT|>"
-CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user (username: {USERNAME}) can run it to solve their problem. Return the code in ``` blocks, and give no explanation. Do not return any text that is not Python code.
-Import all needed requirements."""
+CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT. Please write a full {OPERATING_SYSTEM} Python {PYTHON_VERSION} script, so the user (username: {USERNAME}) can run it to solve their problem. Return the full code in ``` blocks. Never give explanations. Do not return any text that is not Python code.
+Import all needed requirements at the top of the script."""
 DEBUG_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user can run it to solve their problem. For example, if the error was "No such file or directory", then you would download the necessary file or create the directory. Explain your reasoning in plain english, then provide the corrected code. Give the entire code all in one ``` block."""
 INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.
 Return only the command and nothing else."""
 INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} Python {PYTHON_VERSION} pip command so I can install {package}. Please do not explain. Return only the single pip command to install it."""
-LLM_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant. Please give your response to the user's goal."""
-CONGNITIVE_USER_MESSAGE = """. Use a large language model with prompt engineering to help achieve this goal. Use openai.Completion.create with text-davinci-003.
-Don't forget to engineer the prompt to the language model so it returns relevant answers."""
+LLM_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant."""
+
 def USER_MESSAGE(goal, current_dir): return f"""(USER: {USERNAME})
 (DIRECTORY: {current_dir})
 Write {OPERATING_SYSTEM} python {PYTHON_VERSION} code so I can achieve my goal by running my code. Do not explain anything. Return only the code. My goal: [{goal}]. Don't forget to print the final result. """
@@ -29,6 +28,7 @@ import wikipedia
 import pptx
 import openai
 openai.api_key = "your_openai_api_key_here"
+from tqdm import tqdm
 
 # Set the language to English
 wikipedia.set_lang("en")
@@ -46,7 +46,7 @@ title = slide.shapes.title
 title.text = "Eddington Luminosity"
 
 # Add a slide for each section of the Wikipedia page
-for section in ann_page.sections:
+for section in tqdm(ann_page.sections, desc="Creating slides..."):
     # Skip the first section ("Overview")
     if section.title == "Overview":
         continue

@@ -9,3 +9,4 @@ wikipedia
 wikipedia_sections
 pyautogui
 opencv-python
+tqdm

@@ -6,13 +6,13 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 
 ## How to use:
 - install requirements with the command `pip install -r requirements.txt`
-- create a `keys.py` file. It must contain one line, `OPENAI_KEY="your_api_key"`
+- set the environment variable `OPENAI_API_KEY` to your OpenAI API key, or `OPENROUTER_API_KEY` to use OpenRouter instead.
+- optionally, set the environment variable `ENGSHELL_LLM` to the name of the LLM you want to use. For example, `gpt-4o-mini` if you are using OpenAI or `openai/gpt-4o-mini` if you are using OpenRouter.
 - run `python engshell.py` to open engshell
 
 ## Notes:
 - `--debug` allows engshell to debug its own code if it fails.
 - `--showcode` shows the code being executed.
-- `--llm` encourages LLM queries from within the code execution.
 - `clear` resets engshell's memory, along with the console.
 
 ## Examples

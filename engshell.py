@@ -11,16 +11,20 @@ import contextlib
 import platform
 import traceback
 
-openai_client = OpenAI(api_key=OPENAI_KEY)
 CHARS_PER_TOKEN = 4
-MAX_PROMPT = 16000 * CHARS_PER_TOKEN
+MAX_PROMPT = 32000 * CHARS_PER_TOKEN
 CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
 engshell_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "engshell" + Style.RESET_ALL + '>'
 VERBOSE = False
 MAX_DEBUG_ATTEMPTS = 3
 RETRY_ERRORS = ["The server had an error while processing your request. Sorry about that!"]
+MODEL = os.environ["ENGSHELL_LLM"] if os.environ.get("ENGSHELL_LLM") else "gpt-4o-mini"
+openai_client = OpenAI(
+    api_key=os.environ["OPENROUTER_API_KEY"] if os.environ.get("OPENROUTER_API_KEY") else os.environ["OPENAI_API_KEY"],
+    base_url="https://openrouter.ai/api/v1" if os.environ.get("OPENROUTER_API_KEY") else None
+)
 memory = []
-
+    
 def print_console_prompt():
     print(engshell_PREVIX(), end="")
 
@@ -82,7 +86,7 @@ def LLM(prompt, mode='text'):
             {"role": "user", "content": prompt},
         ]
     response = openai_client.chat.completions.create(
-        model="gpt-4-turbo-preview",
+        model=MODEL,
         messages=messages,
     )
     response_content = response.choices[0].message.content
@@ -92,7 +96,6 @@ def LLM(prompt, mode='text'):
     return response_content
 
 def containerize_code(code_string):
-    code_string = code_string.replace('your_openai_api_key_here', OPENAI_KEY)
     # uncomment this if you wish to easily use photos from Unsplash API
     # code_string = code_string.replace('your_unsplash_access_key_here', UNSPLASH_ACCESS_KEY)
     try:
@@ -163,10 +166,8 @@ if __name__ == "__main__":
             clear_memory()
             os.system("cls" if platform.system() == "Windows" else "clear")
             continue
-        if ('--llm' in user_input) or always_llm: user_input += CONGNITIVE_USER_MESSAGE
         debug = ('--debug' in user_input) or always_debug
         showcode = ('--showcode' in user_input) or always_showcode
-        user_input = user_input.replace('--llm','')
         user_input = user_input.replace('--debug','')
         user_input = user_input.replace('--showcode','')
         user_prompt = USER_MESSAGE(user_input, current_dir = os.getcwd())
