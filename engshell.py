@@ -1,189 +1,90 @@
 from openai import OpenAI
-import time
 from colorama import Fore, Style
 import os
 import sys
 from prompts import *
-from keys import *
 import subprocess
 import io
 import contextlib
 import platform
-import traceback
 
-CHARS_PER_TOKEN = 4
-MAX_PROMPT = 32000 * CHARS_PER_TOKEN
-CONTEXT_LEFT, CONTEXT_RIGHT = '{', '}'
-engshell_PREVIX = lambda: Style.RESET_ALL + os.getcwd() + ' ' + Style.RESET_ALL + Fore.MAGENTA + "engshell" + Style.RESET_ALL + '>'
-VERBOSE = False
-MAX_DEBUG_ATTEMPTS = 3
-RETRY_ERRORS = ["The server had an error while processing your request. Sorry about that!"]
-MODEL = os.environ["ENGSHELL_LLM"] if os.environ.get("ENGSHELL_LLM") else "gpt-4o-mini"
+MODEL = "gpt-4o-mini"
+
+# Get LLM server credentials
+API_KEY = os.environ.get("OPENROUTER_API_KEY")
+API_URL = "https://openrouter.ai/api/v1"
+if not API_KEY:
+    API_KEY = os.environ.get("OPENAI_API_KEY")
+    API_URL = "https://api.openai.com/v1"
+    if not API_KEY:
+        print("Please set your OpenRouter or OpenAI API key as an environment variable.")
+        sys.exit(1)
+
 openai_client = OpenAI(
-    api_key=os.environ["OPENROUTER_API_KEY"] if os.environ.get("OPENROUTER_API_KEY") else os.environ["OPENAI_API_KEY"],
-    base_url="https://openrouter.ai/api/v1" if os.environ.get("OPENROUTER_API_KEY") else None
+    api_key=API_KEY,
+    base_url=API_URL
 )
-memory = []
-    
-def print_console_prompt():
-    print(engshell_PREVIX(), end="")
 
-def print_status(status):
-    print_console_prompt()
-    print(Style.RESET_ALL + Fore.YELLOW + status + Style.RESET_ALL)
+def print_formatted(text, color=Fore.WHITE):
+    print(f"{Style.RESET_ALL}{color}{text}{Style.RESET_ALL}")
 
-def print_success(status):
-    print_console_prompt()
-    print(Style.RESET_ALL + Fore.GREEN + status + Style.RESET_ALL)
+def clean_code(code):
+    between_code_tags = code.split('```')[1] if '```' in code else code.strip('`')
+    between_code_tags = between_code_tags.strip()
+    if between_code_tags.startswith("python"):
+        between_code_tags = between_code_tags[6:]
+    return between_code_tags.strip()
 
-def print_err(status):
-    print_console_prompt()
-    print(Style.RESET_ALL + Fore.RED + status + Style.RESET_ALL)
-
-def print_code(status):
-    print_console_prompt()
-    print(Style.RESET_ALL + Fore.LIGHTBLACK_EX + status + Style.RESET_ALL)
-
-def clean_code_string(response_content):
-    lines = response_content.split("\n")
-    for i, line in enumerate(lines):
-        if line.startswith("!pip"):
-            lines.pop(i)
-    response_content = "\n".join(lines)
-
-    split_response_content = response_content.split('```')
-    if len(split_response_content) > 1:
-        response_content = split_response_content[1]
-    for code_languge in ['python', 'bash']:
-        if response_content[:len(code_languge)]==code_languge: response_content = response_content[len(code_languge)+1:] # remove python+newline blocks
-    return response_content.replace('`','')
-
-def clean_install_string(response_content):
-    split_response_content = response_content.split('`')
-    if len(split_response_content) > 1:
-        response_content = split_response_content[1]
-    return response_content.replace('`','').replace('!', '')
-
-def LLM(prompt, mode='text'):
-    global memory
-    if len(prompt) > MAX_PROMPT: 
-        raise ValueError(f'prompt ({len(prompt)}) too large (max {MAX_PROMPT})')
-    if mode == 'text':
-        messages=[
-            {"role": "system", "content": LLM_SYSTEM_CALIBRATION_MESSAGE},
-            {"role": "user", "content": prompt},
-        ]
-    elif mode == 'code':
-        messages=memory
-    elif mode == 'debug':
-        messages=[
-            {"role": "system", "content": DEBUG_SYSTEM_CALIBRATION_MESSAGE},
-            {"role": "user", "content": prompt},
-        ]
-    elif mode == 'install':
-        messages=[
-            {"role": "system", "content": INSTALL_SYSTEM_CALIBRATION_MESSAGE},
-            {"role": "user", "content": prompt},
-        ]
-    response = openai_client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-    )
-    response_content = response.choices[0].message.content
-
-    if mode == 'code' or mode == 'debug': response_content = clean_code_string(response_content)
-    elif mode == 'install': response_content = clean_install_string(response_content)
-    return response_content
-
-def containerize_code(code_string):
-    # uncomment this if you wish to easily use photos from Unsplash API
-    # code_string = code_string.replace('your_unsplash_access_key_here', UNSPLASH_ACCESS_KEY)
+def run_code(code):
+    print_formatted("Running code:", Fore.YELLOW)
+    print_formatted(code, Fore.CYAN)
     try:
-        output_buffer = io.StringIO()
-        with contextlib.redirect_stdout(output_buffer):
-            exec(code_string, globals())
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            exec(code, globals())
+        return True, output.getvalue()
     except Exception as e:
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        tb = traceback.extract_tb(exc_traceback)
-        filename, line, func, text = tb[-1]
-        error_msg = f"{exc_type.__name__}: {str(e)}"
-        return False, f'Error: {error_msg}. Getting the error from function: {func} (line: {line})'
-    code_printout = output_buffer.getvalue()
-    return True, code_printout
+        return False, f"Error: {type(e).__name__}: {str(e)}"
 
-def run_python(returned_code, debug = False, showcode = False):
-    print_status("compiling...")
-    if showcode: 
-        print(returned_code, end = '' if returned_code[-1] == '\n' else '\n')
-    print_status("running...")
-    returned_code = clean_code_string(returned_code)
-    success, output = containerize_code(returned_code)
-    attempts = 0
-    should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
-    should_install = (output is not None) and ('No module named' in output or 'ModuleNotFoundError' in output)
-    should_retry = should_debug or should_install or ((output is not None) and any([(err in output) for err in RETRY_ERRORS]))
-    while should_retry:
-        if should_install:
-            print_status('installing: ' + output)
-            prompt = INSTALL_USER_MESSAGE(output)
-            returned_command = LLM(prompt, mode='install')
-            os.system(returned_command)
-        elif should_debug:
-            print_status('debugging: ' + output)
-            prompt = DEBUG_MESSAGE(returned_code, output)
-            returned_code = LLM(prompt, mode='debug')
-        print_status('rerunning...')
-        returned_code = clean_code_string(returned_code)
-        success, output = containerize_code(returned_code)
-        attempts += 1
-        should_debug = debug and (attempts < MAX_DEBUG_ATTEMPTS) and (not success)
-        should_retry = should_debug or any([(err in output) for err in RETRY_ERRORS])
-    if not success:
-        raise ValueError(f"failed ({output})")
-    return output
+def install_package(error):
+    package = error.split("'")[-2]
+    print_formatted(f"Installing {package}...", Fore.YELLOW)
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-def clear_memory():
-    global memory
+def run_shell():
     memory = [
-            {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
-            {"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE},
-            {"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE},
-            {"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE},
-            # uncomment these if you wish to easily use photos from Unsplash API
-            #{"role": "user", "content": CODE_USER_CALIBRATION_MESSAGE3},
-            #{"role": "assistant", "content": CODE_ASSISTANT_CALIBRATION_MESSAGE3},
-            #{"role": "system", "content": CONSOLE_OUTPUT_CALIBRATION_MESSAGE3},
+        {"role": "system", "content": CODE_SYSTEM_CALIBRATION_MESSAGE},
     ]
 
-if __name__ == "__main__":
-    if os.name == 'nt': os.system('')
-    always_showcode = '--showcode' in sys.argv
-    always_debug = '--debug' in sys.argv
-    always_llm = '--llm' in sys.argv
-    clear_memory()
-    while user_input := input(engshell_PREVIX()):
-        if user_input == 'clear':
-            clear_memory()
+    while True:
+        user_input = input(f"{os.getcwd()} {Fore.CYAN}engshell>{Style.RESET_ALL} ")
+        
+        if user_input.lower() == 'clear':
             os.system("cls" if platform.system() == "Windows" else "clear")
+            memory = memory[:1]
             continue
-        debug = ('--debug' in user_input) or always_debug
-        showcode = ('--showcode' in user_input) or always_showcode
-        user_input = user_input.replace('--debug','')
-        user_input = user_input.replace('--showcode','')
-        user_prompt = USER_MESSAGE(user_input, current_dir = os.getcwd())
-        memory.append({"role": "user", "content": user_prompt})
-        run_code = True
-        while run_code:
-            returned_code = LLM(user_prompt, mode='code')
-            memory.append({"role": "assistant", "content": returned_code})
-            try:
-                console_output = run_python(returned_code, debug, showcode)
-                if console_output.strip() == '': console_output = 'done executing.'
-                print_success(console_output)
-                run_code = False
-            except Exception as e:
-                error_message = str(e)
-                console_output = error_message
-                run_code = any([err in error_message for err in RETRY_ERRORS])
-            if len(console_output) < MAX_PROMPT:
-                memory.append({"role": "system", "content": console_output})
+
+        memory.append({"role": "user", "content": USER_MESSAGE(user_input, os.getcwd())})
+
+        while True:
+            response = openai_client.chat.completions.create(model=MODEL, messages=memory)
+            code = clean_code(response.choices[0].message.content)
+            memory.append({"role": "assistant", "content": code})
+
+            success, output = run_code(code)
+            
+            if success:
+                print_formatted(output or "Code executed successfully.", Fore.GREEN)
+                break
+            elif "No module named" in output or "ImportError" in output:
+                install_package(output)
+            else:
+                print_formatted(output, Fore.RED)
+                memory.append({"role": "system", "content": DEBUG_MESSAGE(code, output)})
+
+        memory.append({"role": "system", "content": output})
+
+if __name__ == "__main__":
+    if os.name == 'nt':
+        os.system('')
+    run_shell()

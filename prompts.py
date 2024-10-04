@@ -4,102 +4,65 @@ import getpass
 USERNAME = getpass.getuser()
 OPERATING_SYSTEM = platform.system()
 PYTHON_VERSION = platform.python_version()
-# in need of good prompt engineering
-ENDOFTEXT = "<|ENDOFTEXT|>"
-CODE_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT. Please write a full {OPERATING_SYSTEM} Python {PYTHON_VERSION} script, so the user (username: {USERNAME}) can run it to solve their problem. Return the full code in ``` blocks. Never give explanations. Do not return any text that is not Python code.
-Import all needed requirements at the top of the script."""
-DEBUG_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user can run it to solve their problem. For example, if the error was "No such file or directory", then you would download the necessary file or create the directory. Explain your reasoning in plain english, then provide the corrected code. Give the entire code all in one ``` block."""
-INSTALL_SYSTEM_CALIBRATION_MESSAGE = ENDOFTEXT+"""You are PipGPT, a large language model trained by OpenAI. Please return the pip install command to solve the user's problem.
-Return only the command and nothing else."""
-INSTALL_USER_MESSAGE = lambda package: f"""Write the {OPERATING_SYSTEM} Python {PYTHON_VERSION} pip command so I can install {package}. Please do not explain. Return only the single pip command to install it."""
-LLM_SYSTEM_CALIBRATION_MESSAGE = """You are a helpful assistant."""
 
-def USER_MESSAGE(goal, current_dir): return f"""(USER: {USERNAME})
+# in need of good prompt engineering
+OPENROUTER_DOCS = """<Openrouter Docs>
+from openai import OpenAI # You MUST import OpenAI from openai. There is no OpenRouter package.
+
+# Always initialize the OpenAI client using OpenRouter credentials
+# NEVER use standard OpenAI.
+openrouter_client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.environ["OPENROUTER_API_KEY"],
+)
+# Messages must be in OpenAI format
+# You must always specify in the prompt that the response should be in JSON format,
+# and always include the desired response structure and key names in the prompt.
+messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Instructional prompt here... Always reply in valid JSON format with the following structure: ..."
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": "data:image/jpeg;base64,..."
+                    }
+                ]
+            },
+        ]
+# Always call the OpenRouter API with these exact parameters
+response = openrouter_client.chat.completions.create(
+    model="openai/gpt-4o-mini",
+    messages=messages,
+    response_format={"type": "json_object"},
+    temperature=0,
+)
+# Get text from response
+response_text = response.choices[0].message.content
+# Load it into a dictionary
+try:
+    response_dict = json.loads(response_text)
+except:
+    response_dict = {"error": f"Failed to decode response: {response_text}"}
+</Openrouter Docs>"""
+CODE_SYSTEM_CALIBRATION_MESSAGE = f"""You are PythonGPT. Please write a full {OPERATING_SYSTEM} Python {PYTHON_VERSION} script, so the user (username: {USERNAME}) can run it to solve their problem. Return the full code in ``` blocks. Never give explanations. Do not return any text that is not Python code.
+Import all needed requirements at the top of the script.
+Always use tqdm to show progress for any loops.
+If you ever want to use AI, you can use OpenRouter API.
+{OPENROUTER_DOCS}
+Return the full code in ``` blocks. Never give explanations. Do not return any text that is not Python code."""
+DEBUG_SYSTEM_CALIBRATION_MESSAGE = f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user can run it to solve their problem. For example, if the error was "No such file or directory", then you would download the necessary file or create the directory. Explain your reasoning in plain english, then provide the corrected code. Give the entire code all in one ``` block."""
+
+def USER_MESSAGE(goal, current_dir): 
+    return f"""(USER: {USERNAME})
 (DIRECTORY: {current_dir})
 Write {OPERATING_SYSTEM} python {PYTHON_VERSION} code so I can achieve my goal by running my code. Do not explain anything. Return only the code. My goal: [{goal}]. Don't forget to print the final result. """
+
 def DEBUG_MESSAGE(code, error):
     return f"""```python
 {code}
 ```
-The above code returns the error "{error}". Please briefly explain why the error is happening, then write the corrected code.""" # CoT prompting improves debugging
-CODE_USER_CALIBRATION_MESSAGE = """get information about eddington luminosity then make a powerpoint about it"""
-CODE_ASSISTANT_CALIBRATION_MESSAGE = """```python
-import wikipedia
-import pptx
-import openai
-openai.api_key = "your_openai_api_key_here"
-from tqdm import tqdm
-
-# Set the language to English
-wikipedia.set_lang("en")
-
-# Get the page object for Artificial Neural Networks (we never want auto_suggest)
-ann_page = wikipedia.page("Eddington Luminosity", auto_suggest=False)
-
-# Create a new PowerPoint presentation
-prs = pptx.Presentation()
-
-# Add a title slide
-title_slide_layout = prs.slide_layouts[0]
-slide = prs.slides.add_slide(title_slide_layout)
-title = slide.shapes.title
-title.text = "Eddington Luminosity"
-
-# Add a slide for each section of the Wikipedia page
-for section in tqdm(ann_page.sections, desc="Creating slides..."):
-    # Skip the first section ("Overview")
-    if section.title == "Overview":
-        continue
-    # Add a new slide
-    bullet_slide_layout = prs.slide_layouts[1]
-    slide = prs.slides.add_slide(bullet_slide_layout)
-    # Set the title of the slide to the section title
-    slide.shapes.title.text = section
-    # Use language model to make bullet points
-    bullet_points = slide.shapes.placeholders[1]
-    section_text = ann_page.section(section)
-    prompt = f"Information is given in the following square brackets: [{section_text}]. Please respond with very brief presentation slide bullet points for it, separated by a ;."
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        temperature=0.5,
-        max_tokens=512,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )
-    print(response.choices[0].text)
-    for point in response_text.split(';'):
-        # Add the bullet point to the slide
-        bullet_item = bullet_points.text_frame.add_paragraph()
-        bullet_item.text = point
-
-# Save the PowerPoint presentation
-prs.save("Eddington_Luminosity.pptx")
-
-# Print to confirm goal has been completed
-print("PowerPoint presentation Eddington_Luminosity.pptx created.")```"""
-CODE_USER_CALIBRATION_MESSAGE_UNSPLASH_EXAMPLE = """make my wallpaper a galaxy"""
-CODE_ASSISTANT_CALIBRATION_MESSAGE_UNSPLASH_EXAMPLE = """```python
-import requests
-import ctypes
-import os
-url = "https://api.unsplash.com/search/photos"
-params = {
-    "query": "galaxy",    # search for "galaxy"
-    "orientation": "landscape",   # limit results to landscape orientation
-    "client_id": "your_unsplash_access_key_here"   # Unsplash access key
-}
-response = requests.get(url, params=params)
-# Get the URL of the first image in the results
-image_url = response.json()["results"][0]["urls"]["regular"]
-# Download the image and save it to a file
-response = requests.get(image_url)
-with open("galaxy.jpg", "wb") as f:
-    f.write(response.content)
-# Change it to a galaxy
-ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.abspath("galaxy.jpg"), 3)
-# Print to confirm goal has been completed
-print("Wallpaper changed to a galaxy.")```"""
-CONSOLE_OUTPUT_CALIBRATION_MESSAGE = """PowerPoint presentation Eddington_Luminosity.pptx created."""
-CONSOLE_OUTPUT_CALIBRATION_MESSAGE_UNSPLASH_EXAMPLE = """Wallpaper changed to a galaxy."""
+The above code returns the error "{error}". Please briefly explain in plain English why the error is happening, then write the corrected code in a code box.""" # CoT prompting improves debugging

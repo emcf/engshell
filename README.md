@@ -7,13 +7,11 @@ https://user-images.githubusercontent.com/11333708/229642800-8441789e-1af4-4e47-
 ## How to use:
 - install requirements with the command `pip install -r requirements.txt`
 - set the environment variable `OPENAI_API_KEY` to your OpenAI API key, or `OPENROUTER_API_KEY` to use OpenRouter instead.
-- optionally, set the environment variable `ENGSHELL_LLM` to the name of the LLM you want to use. For example, `gpt-4o-mini` if you are using OpenAI or `openai/gpt-4o-mini` if you are using OpenRouter.
-- run `python engshell.py` to open engshell
+- run `python engshell.py` to start the shell.
 
 ## Notes:
-- `--debug` allows engshell to debug its own code if it fails.
-- `--showcode` shows the code being executed.
-- `clear` resets engshell's memory, along with the console.
+- Engshell can iteratively debug the generated code if it fails, and can install missing packages automatically.
+- `clear` resets the LLM's memory, along with the console.
 
 ## Examples
 ### 🔧 General:
@@ -50,8 +48,8 @@ This code defines an interactive command-line interface for running Python code 
 
 The flow of main.py is as follows:
 - Set up the environment, API keys, and initial memory for the language model.
-- Wait for user input, then process user input flags (e.g., --llm, --debug, --showcode).
-- Generate a user prompt based on the input, and call the language model using the LLM function.
+- Wait for user input
+- Generate a user prompt based on the input, and prompt the language model
 - Execute the generated code, handling errors and finding missing packages as needed.
 - Display the output, update the memory, and repeat the process.
 - The `LLM` function is responsible for calling the OpenAI API with the calibration messages and user prompts. The function can handle three modes: 'text', 'code', and 'install'. These modes are used to generate prompts for different cases.
