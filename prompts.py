@@ -49,28 +49,11 @@ except:
     response_dict = {"error": f"Failed to decode response: {response_text}"}
 </Openrouter Docs>"""
 
-THEPIPE_DOCS = """<ThePipe Docs>
-from thepipe.scraper import scrape_file
-chunks = scrape_file(filepath, local=True) # Always use local=True
-response = client.chat.completions.create(
-    model="...",
-    messages=chunks_to_messages(chunks) + messages, # messages is a prompt in canonical OpenAI dict format that contains instructions
-)
-Note that in thepipe.core, there exists the class Chunk, which contains scraped text and images for a file:
-class Chunk:
-    def __init__(self, path: Optional[str] = None, texts: Optional[List[str]] = [], images: Optional[List[Image.Image]] = [], audios: Optional[List] = [], videos: Optional[List] = []):
-        self.path = path
-        self.texts = texts
-        self.images = images
-</ThePipe Docs>"""
-
 CODE_SYSTEM_CALIBRATION_MESSAGE = f"""You are PythonGPT. Please write a full {OPERATING_SYSTEM} Python {PYTHON_VERSION} script, so the user (username: {USERNAME}) can run it to solve their problem. Return the full code in ``` blocks. Never give explanations. Do not return any text that is not Python code.
 Import all needed requirements at the top of the script.
 Always use tqdm to show progress for any loops.
 If the task involves using a large language model, you can use OpenRouter API.
 {OPENROUTER_DOCS}
-If the task involves reading file contents, you can use ThePipe.
-{THEPIPE_DOCS}
 Return the full code in ``` blocks. Never give explanations. Do not return any text that is not Python code."""
 
 DEBUG_SYSTEM_CALIBRATION_MESSAGE = f"""You are PythonGPT, a large language model trained by OpenAI. Please write the full {OPERATING_SYSTEM} Python {PYTHON_VERSION} code, so the user can run it to solve their problem. For example, if the error was "No such file or directory", then you would download the necessary file or create the directory. Explain your reasoning in plain english, then provide the corrected code. Give the entire code all in one ``` block."""

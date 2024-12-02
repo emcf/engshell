@@ -68,7 +68,11 @@ def run_shell():
 
         while True:
             response = openai_client.chat.completions.create(model=MODEL, messages=memory)
-            code = clean_code(response.choices[0].message.content)
+            try:
+                code = clean_code(response.choices[0].message.content)
+            except Exception as e:
+                print(f"Error ({e}): LLM response: {response}")
+                exit()
             memory.append({"role": "assistant", "content": code})
 
             success, output = run_code(code)
